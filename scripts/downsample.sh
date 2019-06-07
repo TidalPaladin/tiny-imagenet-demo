@@ -1,4 +1,6 @@
 #!/bin/sh
+# Downsamples an input image to $OUT_RES
+
 file_in=$(readlink -f "$1")
 file_out=$(readlink -f "$2")
 OUT_RES="64x64"
