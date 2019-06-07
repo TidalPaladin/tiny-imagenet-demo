@@ -1,518 +1,518 @@
-n02666196 abacus
-n02667093 abaya
-n02669723 academic gown, academic robe, judge's robe
-n02699494 altar
-n02704792 amphibian, amphibious vehicle
-n02727426 apiary, bee house
-n02730930 apron
-n02776631 bakery, bakeshop, bakehouse
-n02783161 ballpoint, ballpoint pen, ballpen, Biro
-n02786058 Band Aid
-n02788148 bannister, banister, balustrade, balusters, handrail
-n02790996 barbell
-n02794156 barometer
-n02795169 barrel, cask
-n02797295 barrow, garden cart, lawn cart, wheelbarrow
-n02804414 bassinet
-n02804610 bassoon
-n02807133 bathing cap, swimming cap
-n02808304 bath towel
-n02808440 bathtub, bathing tub, bath, tub
-n02814533 beach wagon, station wagon, wagon, estate car, beach waggon, station waggon, waggon
-n02814860 beacon, lighthouse, beacon light, pharos
-n02815834 beaker
-n02817516 bearskin, busby, shako
-n02823750 beer glass
-n02825657 bell cote, bell cot
-n02834397 bib
-n02840245 binder, ring-binder
-n02859443 boathouse
-n02860847 bobsled, bobsleigh, bob
-n02865351 bolo tie, bolo, bola tie, bola
-n02869837 bonnet, poke bonnet
-n02871525 bookshop, bookstore, bookstall
-n02879718 bow
-n02892201 brass, memorial tablet, plaque
-n02892767 brassiere, bra, bandeau
-n02894605 breakwater, groin, groyne, mole, bulwark, seawall, jetty
-n02895154 breastplate, aegis, egis
-n02906734 broom
-n02909870 bucket, pail
-n02910353 buckle
-n02916936 bulletproof vest
-n02927161 butcher shop, meat market
-n02930766 cab, hack, taxi, taxicab
-n02939185 caldron, cauldron
-n02948072 candle, taper, wax light
-n02951585 can opener, tin opener
-n02963159 cardigan
-n02965783 car mirror
-n02966193 carousel, carrousel, merry-go-round, roundabout, whirligig
-n02966687 carpenter's kit, tool kit
-n02971356 carton
-n02974003 car wheel
-n02977058 cash machine, cash dispenser, automated teller machine, automatic teller machine, automated teller, automatic teller, ATM
-n02978881 cassette
-n02979186 cassette player
-n02980441 castle
-n02981792 catamaran
-n02988304 CD player
-n02992211 cello, violoncello
-n02992529 cellular telephone, cellular phone, cellphone, cell, mobile phone
-n02999410 chain
-n03000134 chainlink fence
-n03000247 chain mail, ring mail, mail, chain armor, chain armour, ring armor, ring armour
-n03000684 chain saw, chainsaw
-n03014705 chest
-n03016953 chiffonier, commode
-n03017168 chime, bell, gong
-n03018349 china cabinet, china closet
-n03026506 Christmas stocking
-n03028079 church, church building
-n03032252 cinema, movie theater, movie theatre, movie house, picture palace
-n03041632 cleaver, meat cleaver, chopper
-n03042490 cliff dwelling
-n03045698 cloak
-n03047690 clog, geta, patten, sabot
-n03062245 cocktail shaker
-n03063599 coffee mug
-n03063689 coffeepot
-n03065424 coil, spiral, volute, whorl, helix
-n03075370 combination lock
-n03085013 computer keyboard, keypad
-n03089624 confectionery, confectionary, candy store
-n03100240 convertible
-n03109150 corkscrew, bottle screw
-n03110669 cornet, horn, trumpet, trump
-n03124043 cowboy boot
-n03124170 cowboy hat, ten-gallon hat
-n03125729 cradle
-n03126707 crane
-n03127747 crash helmet
-n03127925 crate
-n03131574 crib, cot
-n03133878 Crock Pot
-n03141823 crutch
-n03146219 cuirass
-n03160309 dam, dike, dyke
-n03179701 desk
-n03180011 desktop computer
-n03187595 dial telephone, dial phone
-n03188531 diaper, nappy, napkin
-n03196217 digital clock
-n03197337 digital watch
-n03201208 dining table, board
-n03207743 dishrag, dishcloth
-n03207941 dishwasher, dish washer, dishwashing machine
-n03208938 disk brake, disc brake
-n03216828 dock, dockage, docking facility
-n03218198 dogsled, dog sled, dog sleigh
-n03220513 dome
-n03223299 doormat, welcome mat
-n03240683 drilling platform, offshore rig
-n03249569 drum, membranophone, tympan
-n03250847 drumstick
-n03255030 dumbbell
-n03259280 Dutch oven
-n03271574 electric fan, blower
-n03272010 electric guitar
-n03272562 electric locomotive
-n03290653 entertainment center
-n03291819 envelope
-n03297495 espresso maker
-n03314780 face powder
-n03325584 feather boa, boa
-n03337140 file, file cabinet, filing cabinet
-n03344393 fireboat
-n03345487 fire engine, fire truck
-n03347037 fire screen, fireguard
-n03355925 flagpole, flagstaff
-n03372029 flute, transverse flute
-n03379051 football helmet
-n03384352 forklift
-n03388043 fountain
-n03388183 fountain pen
-n03388549 four-poster
-n03393912 freight car
-n03394916 French horn, horn
-n03400231 frying pan, frypan, skillet
-n03404251 fur coat
-n03417042 garbage truck, dustcart
-n03424325 gasmask, respirator, gas helmet
-n03425413 gas pump, gasoline pump, petrol pump, island dispenser
-n03443371 goblet
-n03444034 go-kart
-n03445924 golfcart, golf cart
-n03447447 gondola
-n03447721 gong, tam-tam
-n03450230 gown
-n03452741 grand piano, grand
-n03457902 greenhouse, nursery, glasshouse
-n03459775 grille, radiator grille
-n03461385 grocery store, grocery, food market, market
-n03467068 guillotine
-n03476684 hair slide
-n03476991 hair spray
-n03478589 half track
-n03481172 hammer
-n03482405 hamper
-n03483316 hand blower, blow dryer, blow drier, hair dryer, hair drier
-n03485407 hand-held computer, hand-held microcomputer
-n03485794 handkerchief, hankie, hanky, hankey
-n03492542 hard disc, hard disk, fixed disk
-n03494278 harmonica, mouth organ, harp, mouth harp
-n03495258 harp
-n03496892 harvester, reaper
-n03498962 hatchet
-n03527444 holster
-n03529860 home theater, home theatre
-n03530642 honeycomb
-n03532672 hook, claw
-n03534580 hoopskirt, crinoline
-n03535780 horizontal bar, high bar
-n03538406 horse cart, horse-cart
-n03544143 hourglass
-n03584254 iPod
-n03584829 iron, smoothing iron
-n03590841 jack-o'-lantern
-n03594734 jean, blue jean, denim
-n03594945 jeep, landrover
-n03595614 jersey, T-shirt, tee shirt
-n03598930 jigsaw puzzle
-n03599486 jinrikisha, ricksha, rickshaw
-n03602883 joystick
-n03617480 kimono
-n03623198 knee pad
-n03627232 knot
-n03630383 lab coat, laboratory coat
-n03633091 ladle
-n03637318 lampshade, lamp shade
-n03642806 laptop, laptop computer
-n03649909 lawn mower, mower
-n03657121 lens cap, lens cover
-n03658185 letter opener, paper knife, paperknife
-n03661043 library
-n03666591 lighter, light, igniter, ignitor
-n03670208 limousine, limo
-n03673027 liner, ocean liner
-n03676483 lipstick, lip rouge
-n03680355 Loafer
-n03690938 lotion
-n03691459 loudspeaker, speaker, speaker unit, loudspeaker system, speaker system
-n03692522 loupe, jeweler's loupe
-n03697007 lumbermill, sawmill
-n03706229 magnetic compass
-n03709823 mailbag, postbag
-n03710193 mailbox, letter box
-n03710637 maillot
-n03710721 maillot, tank suit
-n03717622 manhole cover
-n03720891 maraca
-n03721384 marimba, xylophone
-n03724870 mask
-n03729826 matchstick
-n03733131 maypole
-n03733281 maze, labyrinth
-n03733805 measuring cup
-n03742115 medicine chest, medicine cabinet
-n03743016 megalith, megalithic structure
-n03759954 microphone, mike
-n03761084 microwave, microwave oven
-n03763968 military uniform
-n03764736 milk can
-n03769881 minibus
-n03770439 miniskirt, mini
-n03770679 minivan
-n03773504 missile
-n03775071 mitten
-n03775546 mixing bowl
-n03776460 mobile home, manufactured home
-n03777568 Model T
-n03777754 modem
-n03781244 monastery
-n03782006 monitor
-n03785016 moped
-n03786901 mortar
-n03787032 mortarboard
-n03788195 mosque
-n03788365 mosquito net
-n03791053 motor scooter, scooter
-n03792782 mountain bike, all-terrain bike, off-roader
-n03792972 mountain tent
-n03793489 mouse, computer mouse
-n03794056 mousetrap
-n03796401 moving van
-n03803284 muzzle
-n03804744 nail
-n03814639 neck brace
-n03814906 necklace
-n03825788 nipple
-n03832673 notebook, notebook computer
-n03837869 obelisk
-n03838899 oboe, hautboy, hautbois
-n03840681 ocarina, sweet potato
-n03841143 odometer, hodometer, mileometer, milometer
-n03843555 oil filter
-n03854065 organ, pipe organ
-n03857828 oscilloscope, scope, cathode-ray oscilloscope, CRO
-n03866082 overskirt
-n03868242 oxcart
-n03868863 oxygen mask
-n03871628 packet
-n03873416 paddle, boat paddle
-n03874293 paddlewheel, paddle wheel
-n03874599 padlock
-n03876231 paintbrush
-n03877472 pajama, pyjama, pj's, jammies
-n03877845 palace
-n03884397 panpipe, pandean pipe, syrinx
-n03887697 paper towel
-n03888257 parachute, chute
-n03888605 parallel bars, bars
-n03891251 park bench
-n03891332 parking meter
-n03895866 passenger car, coach, carriage
-n03899768 patio, terrace
-n03902125 pay-phone, pay-station
-n03903868 pedestal, plinth, footstall
-n03908618 pencil box, pencil case
-n03908714 pencil sharpener
-n03916031 perfume, essence
-n03920288 Petri dish
-n03924679 photocopier
-n03929660 pick, plectrum, plectron
-n03929855 pickelhaube
-n03930313 picket fence, paling
-n03930630 pickup, pickup truck
-n03933933 pier
-n03935335 piggy bank, penny bank
-n03937543 pill bottle
-n03938244 pillow
-n03944341 pinwheel
-n03947888 pirate, pirate ship
-n03950228 pitcher, ewer
-n03954731 plane, carpenter's plane, woodworking plane
-n03956157 planetarium
-n03958227 plastic bag
-n03961711 plate rack
-n03967562 plow, plough
-n03970156 plunger, plumber's helper
-n03976657 pole
-n03977966 police van, police wagon, paddy wagon, patrol wagon, wagon, black Maria
-n03980874 poncho
-n03991062 pot, flowerpot
-n03992509 potter's wheel
-n03995372 power drill
-n03998194 prayer rug, prayer mat
-n04004767 printer
-n04005630 prison, prison house
-n04008634 projectile, missile
-n04009552 projector
-n04019541 puck, hockey puck
-n04023962 punching bag, punch bag, punching ball, punchball
-n04026417 purse
-n04033901 quill, quill pen
-n04033995 quilt, comforter, comfort, puff
-n04037443 racer, race car, racing car
-n04039381 racket, racquet
-n04040759 radiator
-n04041544 radio, wireless
-n04044716 radio telescope, radio reflector
-n04049303 rain barrel
-n04065272 recreational vehicle, RV, R.V.
-n04067472 reel
-n04070727 refrigerator, icebox
-n04074963 remote control, remote
-n04081281 restaurant, eating house, eating place, eatery
-n04086273 revolver, six-gun, six-shooter
-n04090263 rifle
-n04111531 rotisserie
-n04116512 rubber eraser, rubber, pencil eraser
-n04118776 rule, ruler
-n04125021 safe
-n04127249 safety pin
-n04131690 saltshaker, salt shaker
-n04136333 sarong
-n04141076 sax, saxophone
-n04141327 scabbard
-n04141975 scale, weighing machine
-n04146614 school bus
-n04147183 schooner
-n04149813 scoreboard
-n04152593 screen, CRT screen
-n04153751 screw
-n04154565 screwdriver
-n04162706 seat belt, seatbelt
-n04179913 sewing machine
-n04192698 shield, buckler
-n04201297 shoji
-n04204238 shopping basket
-n04204347 shopping cart
-n04208210 shovel
-n04209133 shower cap
-n04209239 shower curtain
-n04228054 ski
-n04229816 ski mask
-n04235860 sleeping bag
-n04238763 slide rule, slipstick
-n04239074 sliding door
-n04243546 slot, one-armed bandit
-n04251144 snorkel
-n04252077 snowmobile
-n04252225 snowplow, snowplough
-n04254120 soap dispenser
-n04254777 sock
-n04258138 solar dish, solar collector, solar furnace
-n04259630 sombrero
-n04263257 soup bowl
-n04264628 space bar
-n04265275 space heater
-n04266014 space shuttle
-n04270147 spatula
-n04275548 spider web, spider's web
-n04277352 spindle
-n04285008 sports car, sport car
-n04286575 spotlight, spot
-n04296562 stage
-n04310018 steam locomotive
-n04311174 steel drum
-n04317175 stethoscope
-n04325704 stole
-n04326547 stone wall
-n04328186 stopwatch, stop watch
-n04330267 stove
-n04332243 strainer
-n04335435 streetcar, tram, tramcar, trolley, trolley car
-n04336792 stretcher
-n04344873 studio couch, day bed
-n04346328 stupa, tope
-n04350905 suit, suit of clothes
-n04355338 sundial
-n04355933 sunglass
-n04356056 sunglasses, dark glasses, shades
-n04357314 sunscreen, sunblock, sun blocker
-n04367480 swab, swob, mop
-n04370456 sweatshirt
-n04371430 swimming trunks, bathing trunks
-n04371774 swing
-n04372370 switch, electric switch, electrical switch
-n04376876 syringe
-n04380533 table lamp
-n04389033 tank, army tank, armored combat vehicle, armoured combat vehicle
-n04392985 tape player
-n04398044 teapot
-n04399382 teddy, teddy bear
-n04404412 television, television system
-n04417672 thatch, thatched roof
-n04418357 theater curtain, theatre curtain
-n04423845 thimble
-n04428191 thresher, thrasher, threshing machine
-n04429376 throne
-n04435653 tile roof
-n04442312 toaster
-n04443257 tobacco shop, tobacconist shop, tobacconist
-n04447861 toilet seat
-n04456115 torch
-n04458633 totem pole
-n04461696 tow truck, tow car, wrecker
-n04462240 toyshop
-n04476259 tray
-n04479046 trench coat
-n04482393 tricycle, trike, velocipede
-n04483307 trimaran
-n04485082 tripod
-n04486054 triumphal arch
-n04487081 trolleybus, trolley coach, trackless trolley
-n04487394 trombone
-n04493381 tub, vat
-n04501370 turnstile
-n04505470 typewriter keyboard
-n04507155 umbrella
-n04509417 unicycle, monocycle
-n04515003 upright, upright piano
-n04522168 vase
-n04523525 vault
-n04525038 velvet
-n04525305 vending machine
-n04532106 vestment
-n04532670 viaduct
-n04536866 violin, fiddle
-n04542943 waffle iron
-n04548362 wallet, billfold, notecase, pocketbook
-n04550184 wardrobe, closet, press
-n04553703 washbasin, handbasin, washbowl, lavabo, wash-hand basin
-n04554684 washer, automatic washer, washing machine
-n04560804 water jug
-n04579145 whiskey jug
-n04579432 whistle
-n04584207 wig
-n04589890 window screen
-n04590129 window shade
-n04591157 Windsor tie
-n04592741 wing
-n04596742 wok
-n04597913 wooden spoon
-n04599235 wool, woolen, woollen
-n04604644 worm fence, snake fence, snake-rail fence, Virginia fence
-n04606251 wreck
-n04612504 yawl
-n04613696 yurt
-n06359193 web site, website, internet site, site
-n06596364 comic book
-n06785654 crossword puzzle, crossword
-n07248320 book jacket, dust cover, dust jacket, dust wrapper
-n07565083 menu
-n07579787 plate
-n07583066 guacamole
-n07584110 consomme
-n07590611 hot pot, hotpot
-n07613480 trifle
-n07614500 ice cream, icecream
-n07615774 ice lolly, lolly, lollipop, popsicle
-n07684084 French loaf
-n07693725 bagel, beigel
-n07711569 mashed potato
-n07714571 head cabbage
-n07714990 broccoli
-n07715103 cauliflower
-n07716358 zucchini, courgette
-n07716906 spaghetti squash
-n07717410 acorn squash
-n07717556 butternut squash
-n07718472 cucumber, cuke
-n07718747 artichoke, globe artichoke
-n07720875 bell pepper
-n07730033 cardoon
-n07742313 Granny Smith
-n07836838 chocolate sauce, chocolate syrup
-n07860988 dough
-n07871810 meat loaf, meatloaf
-n07875152 potpie
-n07880968 burrito
-n07892512 red wine
-n07920052 espresso
-n07932039 eggnog
-n09193705 alp
-n09229709 bubble
-n09256479 coral reef
-n09288635 geyser
-n09399592 promontory, headland, head, foreland
-n09421951 sandbar, sand bar
-n09468604 valley, vale
-n10148035 groom, bridegroom
-n10565667 scuba diver
-n11879895 rapeseed
-n11939491 daisy
-n12057211 yellow lady's slipper, yellow lady-slipper, Cypripedium calceolus, Cypripedium parviflorum
-n12267677 acorn
-n12620546 hip, rose hip, rosehip
-n12768682 buckeye, horse chestnut, conker
-n12985857 coral fungus
-n12998815 agaric
-n13037406 gyromitra
-n13040303 stinkhorn, carrion fungus
-n13044778 earthstar
-n13052670 hen-of-the-woods, hen of the woods, Polyporus frondosus, Grifola frondosa
-n13054560 bolete
-n13133613 ear, spike, capitulum
-n15075141 toilet tissue, toilet paper, bathroom tissue
+n02666196
+n02667093
+n02669723
+n02699494
+n02704792
+n02727426
+n02730930
+n02776631
+n02783161
+n02786058
+n02788148
+n02790996
+n02794156
+n02795169
+n02797295
+n02804414
+n02804610
+n02807133
+n02808304
+n02808440
+n02814533
+n02814860
+n02815834
+n02817516
+n02823750
+n02825657
+n02834397
+n02840245
+n02859443
+n02860847
+n02865351
+n02869837
+n02871525
+n02879718
+n02892201
+n02892767
+n02894605
+n02895154
+n02906734
+n02909870
+n02910353
+n02916936
+n02927161
+n02930766
+n02939185
+n02948072
+n02951585
+n02963159
+n02965783
+n02966193
+n02966687
+n02971356
+n02974003
+n02977058
+n02978881
+n02979186
+n02980441
+n02981792
+n02988304
+n02992211
+n02992529
+n02999410
+n03000134
+n03000247
+n03000684
+n03014705
+n03016953
+n03017168
+n03018349
+n03026506
+n03028079
+n03032252
+n03041632
+n03042490
+n03045698
+n03047690
+n03062245
+n03063599
+n03063689
+n03065424
+n03075370
+n03085013
+n03089624
+n03100240
+n03109150
+n03110669
+n03124043
+n03124170
+n03125729
+n03126707
+n03127747
+n03127925
+n03131574
+n03133878
+n03141823
+n03146219
+n03160309
+n03179701
+n03180011
+n03187595
+n03188531
+n03196217
+n03197337
+n03201208
+n03207743
+n03207941
+n03208938
+n03216828
+n03218198
+n03220513
+n03223299
+n03240683
+n03249569
+n03250847
+n03255030
+n03259280
+n03271574
+n03272010
+n03272562
+n03290653
+n03291819
+n03297495
+n03314780
+n03325584
+n03337140
+n03344393
+n03345487
+n03347037
+n03355925
+n03372029
+n03379051
+n03384352
+n03388043
+n03388183
+n03388549
+n03393912
+n03394916
+n03400231
+n03404251
+n03417042
+n03424325
+n03425413
+n03443371
+n03444034
+n03445924
+n03447447
+n03447721
+n03450230
+n03452741
+n03457902
+n03459775
+n03461385
+n03467068
+n03476684
+n03476991
+n03478589
+n03481172
+n03482405
+n03483316
+n03485407
+n03485794
+n03492542
+n03494278
+n03495258
+n03496892
+n03498962
+n03527444
+n03529860
+n03530642
+n03532672
+n03534580
+n03535780
+n03538406
+n03544143
+n03584254
+n03584829
+n03590841
+n03594734
+n03594945
+n03595614
+n03598930
+n03599486
+n03602883
+n03617480
+n03623198
+n03627232
+n03630383
+n03633091
+n03637318
+n03642806
+n03649909
+n03657121
+n03658185
+n03661043
+n03666591
+n03670208
+n03673027
+n03676483
+n03680355
+n03690938
+n03691459
+n03692522
+n03697007
+n03706229
+n03709823
+n03710193
+n03710637
+n03710721
+n03717622
+n03720891
+n03721384
+n03724870
+n03729826
+n03733131
+n03733281
+n03733805
+n03742115
+n03743016
+n03759954
+n03761084
+n03763968
+n03764736
+n03769881
+n03770439
+n03770679
+n03773504
+n03775071
+n03775546
+n03776460
+n03777568
+n03777754
+n03781244
+n03782006
+n03785016
+n03786901
+n03787032
+n03788195
+n03788365
+n03791053
+n03792782
+n03792972
+n03793489
+n03794056
+n03796401
+n03803284
+n03804744
+n03814639
+n03814906
+n03825788
+n03832673
+n03837869
+n03838899
+n03840681
+n03841143
+n03843555
+n03854065
+n03857828
+n03866082
+n03868242
+n03868863
+n03871628
+n03873416
+n03874293
+n03874599
+n03876231
+n03877472
+n03877845
+n03884397
+n03887697
+n03888257
+n03888605
+n03891251
+n03891332
+n03895866
+n03899768
+n03902125
+n03903868
+n03908618
+n03908714
+n03916031
+n03920288
+n03924679
+n03929660
+n03929855
+n03930313
+n03930630
+n03933933
+n03935335
+n03937543
+n03938244
+n03944341
+n03947888
+n03950228
+n03954731
+n03956157
+n03958227
+n03961711
+n03967562
+n03970156
+n03976657
+n03977966
+n03980874
+n03991062
+n03992509
+n03995372
+n03998194
+n04004767
+n04005630
+n04008634
+n04009552
+n04019541
+n04023962
+n04026417
+n04033901
+n04033995
+n04037443
+n04039381
+n04040759
+n04041544
+n04044716
+n04049303
+n04065272
+n04067472
+n04070727
+n04074963
+n04081281
+n04086273
+n04090263
+n04111531
+n04116512
+n04118776
+n04125021
+n04127249
+n04131690
+n04136333
+n04141076
+n04141327
+n04141975
+n04146614
+n04147183
+n04149813
+n04152593
+n04153751
+n04154565
+n04162706
+n04179913
+n04192698
+n04201297
+n04204238
+n04204347
+n04208210
+n04209133
+n04209239
+n04228054
+n04229816
+n04235860
+n04238763
+n04239074
+n04243546
+n04251144
+n04252077
+n04252225
+n04254120
+n04254777
+n04258138
+n04259630
+n04263257
+n04264628
+n04265275
+n04266014
+n04270147
+n04275548
+n04277352
+n04285008
+n04286575
+n04296562
+n04310018
+n04311174
+n04317175
+n04325704
+n04326547
+n04328186
+n04330267
+n04332243
+n04335435
+n04336792
+n04344873
+n04346328
+n04350905
+n04355338
+n04355933
+n04356056
+n04357314
+n04367480
+n04370456
+n04371430
+n04371774
+n04372370
+n04376876
+n04380533
+n04389033
+n04392985
+n04398044
+n04399382
+n04404412
+n04417672
+n04418357
+n04423845
+n04428191
+n04429376
+n04435653
+n04442312
+n04443257
+n04447861
+n04456115
+n04458633
+n04461696
+n04462240
+n04476259
+n04479046
+n04482393
+n04483307
+n04485082
+n04486054
+n04487081
+n04487394
+n04493381
+n04501370
+n04505470
+n04507155
+n04509417
+n04515003
+n04522168
+n04523525
+n04525038
+n04525305
+n04532106
+n04532670
+n04536866
+n04542943
+n04548362
+n04550184
+n04553703
+n04554684
+n04560804
+n04579145
+n04579432
+n04584207
+n04589890
+n04590129
+n04591157
+n04592741
+n04596742
+n04597913
+n04599235
+n04604644
+n04606251
+n04612504
+n04613696
+n06359193
+n06596364
+n06785654
+n07248320
+n07565083
+n07579787
+n07583066
+n07584110
+n07590611
+n07613480
+n07614500
+n07615774
+n07684084
+n07693725
+n07711569
+n07714571
+n07714990
+n07715103
+n07716358
+n07716906
+n07717410
+n07717556
+n07718472
+n07718747
+n07720875
+n07730033
+n07742313
+n07836838
+n07860988
+n07871810
+n07875152
+n07880968
+n07892512
+n07920052
+n07932039
+n09193705
+n09229709
+n09256479
+n09288635
+n09399592
+n09421951
+n09468604
+n10148035
+n10565667
+n11879895
+n11939491
+n12057211
+n12267677
+n12620546
+n12768682
+n12985857
+n12998815
+n13037406
+n13040303
+n13044778
+n13052670
+n13054560
+n13133613
+n15075141
