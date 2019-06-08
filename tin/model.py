@@ -137,40 +137,7 @@ class ResnetBasic(tf.keras.Model):
         return self.conv2d(_, **kwargs)
 
 class Bottleneck(tf.keras.Model):
-    """
-    Residual bottleneck layer consisting of:
 
-                          |
-        +-----------------+
-        |                 |
-        |                 v
-        |   +-------------+------------+
-        |   |             Conv2D 1x1/1 |
-        |   | BN + ReLU + padding=same |
-        |   |             No=Ni/4      |
-        |   +-------------+------------+
-        |                 |
-        |                 v
-        |   +-------------+------------+
-        |   |             Conv2D 3x3/1 |
-        |   | BN + ReLU + padding=same |
-        |   |             No=Ni        |
-        |   +-------------+------------+
-        |                 |
-        |                 v
-        |   +-------------+------------+
-        |   |             Conv2D 1x1/1 |
-        |   | BN + ReLU + padding=same |
-        |   |             No=4Ni       |
-        |   +-------------+------------+
-        |                 |
-        |                 v
-        |              +--+--+
-        +------------->+ Add |
-                       +--+--+
-                          |
-                          v
-    """
     def __init__(self, Ni, *args, **kwargs):
         """
         Arguments:
@@ -203,42 +170,7 @@ class Bottleneck(tf.keras.Model):
         return self.merge([inputs, res], **kwargs)
 
 class SpecialBottleneck(Bottleneck):
-    """
-    Special bottleneck layer consisting of:
 
-                                  +
-                                  |
-                                  v
-                 +----------------+----------------+
-                 |                                 |
-                 v                                 v
-    +------------+-------------+     +-------------+------------+
-    |             Conv2D 1x1/1 |     |             Conv2D 1x1/1 |
-    | BN + ReLU + padding=same |     | BN + ReLU + padding=same |
-    |             No=Ni        |     |             No=Ni/4      |
-    +------------+-------------+     +-------------+------------+
-                 |                                 |
-                 |                                 v
-                 |                   +-------------+------------+
-                 |                   |             Conv2D 3x3/1 |
-                 |                   | BN + ReLU + padding=same |
-                 |                   |             No=Ni        |
-                 |                   +-------------+------------+
-                 |                                 |
-                 |                                 v
-                 |                   +-------------+------------+
-                 |                   |             Conv2D 1x1/1 |
-                 |                   | BN + ReLU + padding=same |
-                 |                   |             No=4Ni       |
-                 |                   +-------------+------------+
-                 |                                 |
-                 |                                 v
-                 |                              +--+--+
-                 +----------------------------->+ Add |
-                                                +--+--+
-                                                   |
-                                                   v
-    """
     def __init__(self, Ni, *args, **kwargs):
 
         # Layers that also appear in standard bottleneck
@@ -266,42 +198,7 @@ class SpecialBottleneck(Bottleneck):
         return self.merge([main, res])
 
 class Downsample(tf.keras.Model):
-    """
-    Residual downsampling layer consisting of:
 
-                                  +
-                                  |
-                                  v
-                 +----------------+----------------+
-                 |                                 |
-                 v                                 v
-    +------------+-------------+     +-------------+------------+
-    |             Conv2D 1x1/2 |     |             Conv2D 1x1/2 |
-    | BN + ReLU +              |     | BN + ReLU +              |
-    |             No=Ni/2      |     |             No=Ni/2      |
-    +------------+-------------+     +-------------+------------+
-                 |                                 |
-                 |                                 v
-                 |                   +-------------+------------+
-                 |                   |             Conv2D 3x3/1 |
-                 |                   | BN + ReLU + padding=same |
-                 |                   |             No=Ni        |
-                 |                   +-------------+------------+
-                 |                                 |
-                 |                                 v
-                 |                   +-------------+------------+
-                 |                   |             Conv2D 1x1/1 |
-                 |                   | BN + ReLU + padding=same |
-                 |                   |             No=2Ni       |
-                 |                   +-------------+------------+
-                 |                                 |
-                 |                                 v
-                 |                              +--+--+
-                 +----------------------------->+ Add |
-                                                +--+--+
-                                                   |
-                                                   v
-    """
     def __init__(self, Ni, *args, **kwargs):
         super(Downsample, self).__init__(*args, **kwargs)
 
