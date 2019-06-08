@@ -334,6 +334,33 @@ class Downsample(tf.keras.Model):
         # Merge residual and main
         return self.merge([main, res])
 
+
+
+class ResnetHead(tf.keras.Model):
+    """
+    Basic vision classification network head consisting of:
+        1. 2D Global average pooling
+        2. Fully connected layer + BN + ReLU
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(Resnet, self).__init__(*args, **kwargs)
+
+        self.global_avg = layers.GlobalAveragePooling2D(
+                name='GAP'
+        )
+
+        self.dense = layers.Dense(
+                classes,
+                name='dense',
+                use_bias=True
+        )
+
+    def call(self, inputs, **kwargs):
+        _ = self.global_avg(inputs)
+        return self.dense(_, **kwargs)
+
+
 class Resnet(tf.keras.Model):
     """
     Full network model consisting of the following layers, each
@@ -378,20 +405,7 @@ class Resnet(tf.keras.Model):
         self.level2_batch_norm = layers.BatchNormalization(name='final_bn')
         self.level2_relu = layers.ReLU(name='final_relu')
 
-        # Decoder - global average pool and fully connected
-        self.global_avg = layers.GlobalAveragePooling2D(
-                name='GAP'
-        )
-
-        # Dense with regularizer, just as a test
-        self.dense = layers.Dense(
-                classes,
-                name='dense',
-                # Just for fun, show a regularized layer
-                kernel_regularizer=tf.keras.regularizers.l2(0.01),
-                use_bias=True
-        )
-
+        self.head = ResnetHead()
 
     def call(self, inputs, **kwargs):
         x = self.tail(inputs, **kwargs)
@@ -405,6 +419,4 @@ class Resnet(tf.keras.Model):
         x = self.level2_batch_norm(x, **kwargs)
         x = self.level2_relu(x)
 
-        # Decoder
-        x = self.global_avg(x)
-        return self.dense(x, **kwargs)
+        return self.head(x, **kwargs)
