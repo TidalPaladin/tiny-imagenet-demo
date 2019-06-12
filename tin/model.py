@@ -8,13 +8,10 @@ from tensorflow.keras import Model
 
 class Tail(tf.keras.Model):
 
-    def __init__(self, out_width=32, **kwargs):
+    def __init__(self, out_width=32):
         """
         Arguments:
             out_width: Number of output feature maps. Default 32.
-
-        Keyword Arguments:
-            Forwarded to the Conv2D layer
         """
         super().__init__()
 
@@ -27,7 +24,6 @@ class Tail(tf.keras.Model):
                 strides=2,
                 use_bias=False,
                 activation=None,
-                **kwargs
         )
 
     def call(self, inputs, training=False, **kwargs):
@@ -69,37 +65,39 @@ class Bottleneck(tf.keras.Model):
         super().__init__()
 
         # 1x1 depthwise convolution, enter the bottleneck
-        self.channel_conv_1 = layers.Conv2D
+        self.channel_conv_1 = layers.Conv2D(
                 filters=out_width // bottleneck,
                 name='Bottleneck_enter',
                 kernel_size=(1, 1),
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
 
         # 3x3 depthwise separable convolution
-        self.spatial_conv = layers.DepthwiseConv2D
-                filters=out_width // bottleneck,
+        self.spatial_conv = layers.DepthwiseConv2D(
                 name='Bottleneck_spatial',
                 kernel_size=(3, 3),
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn2 = layers.BatchNormalization()
         self.relu2 = layers.ReLU()
 
         # 1x1 depthwise convolution, exit the bottleneck
-        self.channel_conv_1 = layers.Conv2D
+        self.channel_conv_2 = layers.Conv2D(
                 filters=out_width,
                 name='Bottleneck_exit',
                 kernel_size=(1, 1),
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn3 = layers.BatchNormalization()
         self.relu3 = layers.ReLU()
@@ -123,19 +121,19 @@ class Bottleneck(tf.keras.Model):
         """
 
         # Enter bottleneck, depthwise convolution
-        _ = self.bn1(_, training, **kwargs)
-        _ = self.relu1(_, **kwargs)
-        _ = self.channel_conv_1(inputs, **kwargs)
+        _ = self.bn1(inputs, training=training)
+        _ = self.relu1(_)
+        _ = self.channel_conv_1(_)
 
         # Spatial convolution, depthwise separable
-        _ = self.bn2(_, training, **kwargs)
-        _ = self.relu2(_, **kwargs)
-        _ = self.spatial_conv(_, **kwargs)
+        _ = self.bn2(_, training=training)
+        _ = self.relu2(_)
+        _ = self.spatial_conv(_)
 
         # Exit bottleneck, depthwise convolution
-        _ = self.bn3(_, training, **kwargs)
-        _ = self.relu3(_, **kwargs)
-        _ = self.channel_conv_2(_, **kwargs)
+        _ = self.bn3(_, training=training)
+        _ = self.relu3(_)
+        _ = self.channel_conv_2(_)
 
         # Combine residual and main paths
         return self.merge([inputs, _], **kwargs)
@@ -173,20 +171,20 @@ class Downsample(tf.keras.Model):
         super().__init__()
 
         # 1x1 convolution, enter the bottleneck
-        self.channel_conv_1 = layers.Conv2D
+        self.channel_conv_1 = layers.Conv2D(
                 filters=out_width // bottleneck,
                 name='Downsample_enter',
                 kernel_size=(1, 1),
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
 
         # 3x3 depthwise separable spatial convolution
-        self.spatial_conv = layers.DepthwiseConv2D
-                filters=out_width // bottleneck,
+        self.spatial_conv = layers.DepthwiseConv2D(
                 name='Downsample_conv',
                 kernel_size=(3, 3),
                 strides=stride,
@@ -197,20 +195,21 @@ class Downsample(tf.keras.Model):
         self.relu2 = layers.ReLU()
 
         # 1x1 convolution, exit the bottleneck
-        self.channel_conv_1 = layers.Conv2D
+        self.channel_conv_2 = layers.Conv2D(
                 filters=out_width,
                 name='Downsample_exit',
                 kernel_size=(1, 1),
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn3 = layers.BatchNormalization()
         self.relu3 = layers.ReLU()
 
         # 3x3/2 convolution along main path
-        self.main = layers.DepthwiseConv2D
-                filters=out_width // bottleneck,
+        self.main = layers.Conv2D(
+                filters=out_width,
                 name='Downsample_main',
                 kernel_size=(3, 3),
                 strides=stride,
@@ -223,7 +222,7 @@ class Downsample(tf.keras.Model):
         # Merge operation to join residual + main paths
         self.merge = layers.Add()
 
-    def call(self, inputs, **kwargs):
+    def call(self, inputs, training=False, **kwargs):
         """
         Runs the forward pass for this layer
 
@@ -239,28 +238,28 @@ class Downsample(tf.keras.Model):
         """
 
         # Enter bottleneck
-        _ = self.bn1(_, **kwargs)
-        _ = self.relu1(_, **kwargs)
-        _ = self.channel_conv_1(inputs, **kwargs)
+        _ = self.bn1(inputs, training=training)
+        _ = self.relu1(_)
+        _ = self.channel_conv_1(_)
 
         # Spatial convolution
-        _ = self.bn2(_, **kwargs)
-        _ = self.relu2(_, **kwargs)
-        _ = self.spatial_conv(_, **kwargs)
+        _ = self.bn2(_, training=training)
+        _ = self.relu2(_)
+        _ = self.spatial_conv(_)
 
         # Exit bottleneck
-        _ = self.bn3(_, **kwargs)
-        _ = self.relu3(_, **kwargs)
-        _ = self.channel_conv_2(_, **kwargs)
+        _ = self.bn3(_, training=training)
+        _ = self.relu3(_)
+        _ = self.channel_conv_2(_)
 
         # Main path with convolution
         # TODO can we use first residual BN + ReLU here?
-        m = self.bn_main(m)
+        m = self.bn_main(inputs, training=training)
         m = self.relu_main(m)
-        main = self.main(inputs, **kwargs)
+        main = self.main(m)
 
         # Combine residual and main paths
-        return self.merge([main, _], **kwargs)
+        return self.merge([main, _])
 
 
 class ResnetHead(tf.keras.Model):
@@ -270,7 +269,7 @@ class ResnetHead(tf.keras.Model):
         2. Fully connected layer + BN + ReLU
     """
 
-    def __init__(self, classes=100, **kwargs):
+    def __init__(self, classes=100):
         """
         Arguments:
             classes:    Positive integer, number of classes in the output of the
@@ -279,7 +278,7 @@ class ResnetHead(tf.keras.Model):
         Keyword Arguments:
             Forwarded to the dense layer.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__()
 
         self.global_avg = layers.GlobalAveragePooling2D()
         self.dense = layers.Dense(
@@ -287,12 +286,11 @@ class ResnetHead(tf.keras.Model):
                 use_bias=True,
                 activation=None,
                 name='ResnetHead_dense',
-                **kwargs
         )
 
     def call(self, inputs, **kwargs):
         _ = self.global_avg(inputs)
-        return self.dense(_, **kwargs)
+        return self.dense(_)
 
 
 class TinyImageNet(tf.keras.Model):
@@ -314,7 +312,7 @@ class TinyImageNet(tf.keras.Model):
         width = 32
 
         # Use default head/tail if requested in params
-        self.tail = Tail(out_width=filters) if use_tail else None
+        self.tail = Tail(out_width=width) if use_tail else None
         self.head = ResnetHead(classes=100) if use_head else None
 
         # Loop through levels and their parameterized repeat counts
@@ -338,7 +336,7 @@ class TinyImageNet(tf.keras.Model):
         self.final_relu = layers.ReLU(name='final_relu')
         self.head = ResnetHead() if use_head else None
 
-    def call(self, inputs, **kwargs):
+    def call(self, inputs, training=False, **kwargs):
         """
         Runs the forward pass for this layer
 
@@ -352,14 +350,14 @@ class TinyImageNet(tf.keras.Model):
         Return:
             Output of forward pass
         """
-        _ = self.tail(inputs, **kwargs) if self.tail else inputs
+        _ = self.tail(inputs, training=training) if self.tail else inputs
 
         # Loop over layers by level
         for layer in self.blocks:
-            _ = layer(_, **kwargs)
+            _ = layer(_, training=training)
 
         # Finish up specials in level 2
-        _ = self.final_bn(_, **kwargs)
+        _ = self.final_bn(_, training=training)
         _ = self.final_relu(_)
 
         return self.head(_, **kwargs) if self.head else _
