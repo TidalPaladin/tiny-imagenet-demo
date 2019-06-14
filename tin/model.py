@@ -72,7 +72,6 @@ class Bottleneck(tf.keras.Model):
                 strides=1,
                 use_bias=False,
                 activation=None,
-                padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
@@ -97,7 +96,6 @@ class Bottleneck(tf.keras.Model):
                 strides=1,
                 use_bias=False,
                 activation=None,
-                padding='same'
         )
         self.bn3 = layers.BatchNormalization()
         self.relu3 = layers.ReLU()
@@ -178,7 +176,6 @@ class Downsample(tf.keras.Model):
                 strides=1,
                 use_bias=False,
                 activation=None,
-                padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
@@ -202,7 +199,6 @@ class Downsample(tf.keras.Model):
                 strides=1,
                 use_bias=False,
                 activation=None,
-                padding='same'
         )
         self.bn3 = layers.BatchNormalization()
         self.relu3 = layers.ReLU()
