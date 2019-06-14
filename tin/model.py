@@ -259,7 +259,7 @@ class Downsample(tf.keras.Model):
         return self.merge([main, _])
 
 
-class ResnetHead(tf.keras.Model):
+class Head(tf.keras.Model):
     """
     Basic vision classification network head consisting of:
         1. 2D Global average pooling
@@ -282,7 +282,7 @@ class ResnetHead(tf.keras.Model):
                 units=classes,
                 use_bias=True,
                 activation=None,
-                name='ResnetHead_dense',
+                name='Head_dense',
         )
 
     def call(self, inputs, **kwargs):
@@ -308,9 +308,8 @@ class TinyImageNet(tf.keras.Model):
         super().__init__()
         width = 32
 
-        # Use default head/tail if requested in params
+        # Use default tail if requested in params
         self.tail = Tail(out_width=width) if use_tail else None
-        self.head = ResnetHead(classes=100) if use_head else None
 
         # Loop through levels and their parameterized repeat counts
         self.blocks = list()
@@ -331,7 +330,9 @@ class TinyImageNet(tf.keras.Model):
 
         self.final_bn = layers.BatchNormalization(name='final_bn')
         self.final_relu = layers.ReLU(name='final_relu')
-        self.head = ResnetHead() if use_head else None
+
+        # Use default head if requested in params
+        self.head = Head(classes=100) if use_head else None
 
     def call(self, inputs, training=False, **kwargs):
         """
