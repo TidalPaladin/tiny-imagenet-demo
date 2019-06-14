@@ -15,3 +15,5 @@ convert \
 	-density ${DENSITY} \
 	-unsharp 1.5x1+0.7+0.02 \
 	"${file_out}"
+
+echo $(ls -hs $file_out)
