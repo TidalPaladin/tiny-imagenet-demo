@@ -20,8 +20,9 @@ class Tail(tf.keras.Model):
         self.conv = layers.Conv2D(
                 filters=out_width,
                 name='Tail_conv',
-                kernel_size=(7, 7),
-                strides=2,
+                kernel_size=(3, 3),
+                strides=1,
+                padding='same',
                 use_bias=False,
                 activation=None,
         )
