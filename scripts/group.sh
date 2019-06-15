@@ -1,54 +1,56 @@
-#!/bin/sh
-CONVERT="$PWD/downsample.sh"
-THREADS=6
+#!/bin/bash
+CONVERT="${PWD}/downsample.sh"
+THREADS=10
+GROUP_DIGIT=4
+
+export SHELL=$(type -p bash)
+source ${CONVERT}
 
 # Examples per class in output dataset
 CLASS_SIZE=1000
 
 # Read source dir from args or use current directory
-SRC_DIR=$(readlink -f "$1" || echo "$PWD")
-[ -d $SRC_DIR ] || (echo "Source dir doesn't exist"; exit 1)
+SRC_DIR=$(readlink -f "$1" || echo "${PWD}")
+[ -d ${SRC_DIR} ] || (echo "Source dir doesn't exist"; exit 1)
 
 # Read dest dir from args or use current directory + /dataset
-DEST_DIR=$(readlink -f "$2" || echo "$PWD/dataset")
-mkdir -p $DEST_DIR || (echo "Could not create dest dir"; exit 1)
+DEST_DIR=$(readlink -f "$2" || echo "${PWD}/dataset")
+mkdir -p ${DEST_DIR} || (echo "Could not create dest dir"; exit 1)
 
-# TODO remove overrides before release
-SRC_DIR="/mnt/valak/documents/imagenet/ILSVRC/Data/CLS-LOC/train"
-DEST_DIR="/home/tidal/Documents/tiny-imagenet-demo/dataset"
+CLASS_FILE=$(readlink -f "${PWD}/class_list.txt")
+[ -f "${CLASS_FILE}" ] || (echo "Could not find class_list.txt"; exit 1)
 
-CLASSES=$(readlink -f "$PWD/class_list.txt")
-[ -f "$CLASSES" ] || (echo "Could not find class_list.txt"; exit 1)
-lines=$(grep -oE "n[0-9]*" $CLASSES)
+# Group classes up to a numeric digit in class labels
+prefixes=$(grep -oE "n[0-9]{$GROUP_DIGIT}" ${CLASS_FILE} | uniq)
 
-# Group classes up to the 4th numeric digit in class labels
-GROUP_DIGIT=4
-prefixes=$(echo "$lines" | grep -oE "n[0-9]{$GROUP_DIGIT}" | uniq)
-echo "Matched $(wc -l <<< $prefixes) prefixes"
-
-for prefix in $prefixes
+for prefix in ${prefixes}
 do
 
 	# Class list matching current prefix
-	classes=$(grep -oE "${prefix}[0-9]*" $CLASSES)
+	classes=$(grep -oE "${prefix}[0-9]*" ${CLASS_FILE})
 	num_classes=$(echo "$classes" | wc -l)
 	echo "Processing $prefix: $num_classes classes"
 
 	# How many examples to take from each class
-	take=$(($CLASS_SIZE / $num_classes))
+	take=$((${CLASS_SIZE} / ${num_classes}))
 
-	for class in $classes
+	for class in ${classes}
 	do
-		dir=$(readlink -f $SRC_DIR/$class)
-		[ -d $dir ] || (echo "$dir does not exist" && continue)
+		# Look for the class directory in original dataset
+		src=$(readlink -f ${SRC_DIR}/${class})
+		[ -d ${src} ] || (echo "${src} does not exist"; continue)
 
-		# Make directory for examples aggregated by prefix
-		dest="$DEST_DIR/$prefix"
-		mkdir -p $dest || (echo "Could not create $prefix output dir"; continue)
+		# Make dest directory for examples aggregated by prefix
+		dest="${DEST_DIR}/${prefix}"
+		mkdir -p ${dest} || (echo "Could not create ${prefix} output dir"; continue)
 
-		find $dir/ | head -n $take | xargs -r -I {} -P $THREADS \
-			sh -c "$CONVERT {} $dest/\$(basename {})" \
-			&& echo "Processed $take examples from $class"
+		ls ${src} | grep 'JPEG' | head -n ${take} | parallel \
+			-r \
+			-j $THREADS \
+			downsample "$src/{}" "$dest/{}" || exit 2
+
+		echo "Processed $take examples from $class"
+
 	done
 	echo "Finished prefix $prefix"
 done
