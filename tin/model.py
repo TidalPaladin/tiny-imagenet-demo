@@ -188,6 +188,7 @@ class Downsample(tf.keras.Model):
                 strides=stride,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn2 = layers.BatchNormalization()
         self.relu2 = layers.ReLU()
@@ -212,6 +213,7 @@ class Downsample(tf.keras.Model):
                 strides=stride,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn_main = layers.BatchNormalization()
         self.relu_main = layers.ReLU()
