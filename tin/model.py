@@ -2,318 +2,362 @@
 This module provides a Tensorflow 2.0 implementation of a vision
 classification network for Tiny ImageNet.
 """
-from functools import wraps
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 
-
 class Tail(tf.keras.Model):
-    """
-    Convolutional tail layer consisting of:
-        1. 7x7/2 conv2d + batch norm + ReLU
-        2. 3x3/2 max pool
-    """
 
-    # Default args for convolution layer
-    CONV_ARGS = {
-            'kernel_size': (7, 7),
-            'strides': 2,
-            'use_bias': False,
-            'name': 'tail_conv',
-    }
-
-    # Default args for max pool layer
-    POOL_ARGS = {
-            'pool_size': (2, 2),
-            'strides': 2,
-            'name': 'tail_pool'
-    }
-
-    def __init__(self, filters, *args, **kwargs):
+    def __init__(self, out_width=32):
         """
         Arguments:
-            filters: Number of input feature maps
-
-        Keyword Arguments:
-            conv_kwargs: keyword args forwarded to the Conv2D layer
-            bn_args: keyword args forwarded to the batch norm layer
-            relu_args: keyword args forwarded to the ReLU layer
-            pool_args: keyword args forwarded to the MaxPool layer
+            out_width: Number of output feature maps. Default 32.
         """
-        # Override default args with those given in __init__ call
-        conv_args = Tail.CONV_ARGS
-        conv_args.update(kwargs.pop('conv_kwargs', {}))
-        conv_args['filters'] = filters
+        super().__init__()
 
-        pool_args = Tail.POOL_ARGS
-        pool_args.update(kwargs.pop('pool_kwargs', {}))
+        # Construct 7x7/2 convolution layer
+        # No BN / ReLU, handled in later blocks
+        self.conv = layers.Conv2D(
+                filters=out_width,
+                name='Tail_conv',
+                kernel_size=(3, 3),
+                strides=1,
+                padding='same',
+                use_bias=False,
+                activation=None,
+        )
 
-        bn_args = kwargs.pop('bn_kwargs', {})
-        relu_args = kwargs.pop('relu_kwargs', {})
-
-        # Call parent constructor with *args, **kwargs
-        super().__init__(*args, **kwargs)
-
-        self.conv = layers.Conv2D(**conv_args)
-        self.bn = layers.BatchNormalization(**bn_args)
-        self.relu = layers.ReLU(**relu_args)
-        self.pool = layers.MaxPool2D(**pool_args)
-
-    def call(self, input, **kwargs):
+    def call(self, inputs, training=False, **kwargs):
         """
         Runs the forward pass for this layer
 
         Arguments:
-            input: input to this layer
+            input: input tensor(s)
+            training: boolean, whether or not
 
         Keyword Arguments:
             Forwarded to call() of each component layer.
 
         Return:
-            Output of forward pass: Conv2D -> BatchNorm -> ReLU -> MaxPool
+            Output of forward pass
         """
-        _ = self.conv(inputs, **kwargs)
-        _ = self.bn(_, **kwargs)
-        _ = self.relu(_, **kwargs)
-        return self.pool(_, **kwargs)
-
-class ResnetBasic(tf.keras.Model):
-    """
-    Base class for a generic residual layer consisting of:
-        1. Batch norm + ReLU
-        2. Conv2D (with parameterized kernel/filters)
-    """
-
-    # Default args for convolution layer
-    CONV_ARGS = {
-            'kernel_size': (3, 3),
-            'strides': 1,
-            'padding': 'same',
-            'activation': None,
-            'use_bias': False,
-    }
-
-    def __init__(self, filters, *args, **kwargs):
-        """
-        Arguments:
-            filters: Number of input feature maps
-
-        Keyword Arguments:
-            conv_kwargs: keyword args forwarded to the Conv2D layer
-            bn_args: keyword args forwarded to the batch norm layer
-            relu_args: keyword args forwarded to the ReLU layer
-        """
-        # Override default args with those given in __init__ call
-        conv_args = ResnetBasic.CONV_ARGS
-        conv_args.update(kwargs.pop('conv_kwargs', {}))
-        conv_args['filters'] = filters
-
-        bn_args = kwargs.pop('bn_kwargs', {})
-        relu_args = kwargs.pop('relu_kwargs', {})
-
-        # Call parent constructor with *args, **kwargs
-        super().__init__(*args, **kwargs)
-
-        self.batch_norm = layers.BatchNormalization(**bn_args)
-        self.relu = layers.ReLU(**relu_args)
-        self.conv2d = layers.Conv2D(**conv_args)
-
-    def call(self, input, **kwargs):
-        """
-        Runs the forward pass for this layer
-
-        Arguments:
-            input: input to this layer
-
-        Keyword Arguments:
-            Forwarded to call() of each component layer.
-
-        Return:
-            Output of forward pass: Conv2D -> BatchNorm -> ReLU
-        """
-        _ = self.batch_norm(input, **kwargs)
-        _ = self.relu(x, **kwargs)
-        return self.conv2d(_, **kwargs)
+        return self.conv(inputs, **kwargs)
 
 class Bottleneck(tf.keras.Model):
+    """
+    Resnet style residual bottleneck block consisting of:
+        1. 1x1/1 channel convolution, Ni / 4 bottleneck
+        2. 3x3/1 spatial convolution
+        3. 1x1/1 channel convolution, exit width bottleneck
+    """
 
-    def __init__(self, Ni, *args, **kwargs):
+    def __init__(self, out_width, bottleneck=4):
         """
+        Constructs a bottleneck block with the final number of output
+        feature maps given by `out_width`. Bottlenecked layers will have
+        output feature map count given by `out_width // bottleneck`.
+
         Arguments:
-            Ni: Number of input feature maps
+            out_width: Positive integer, number of output feature maps.
+
+            bottleneck: Positive integer, factor by which to bottleneck
+                        relative to `out_width`. Default 4.
+        """
+        super().__init__()
+
+        # 1x1 depthwise convolution, enter the bottleneck
+        self.channel_conv_1 = layers.Conv2D(
+                filters=out_width // bottleneck,
+                name='Bottleneck_enter',
+                kernel_size=(1, 1),
+                strides=1,
+                use_bias=False,
+                activation=None,
+        )
+        self.bn1 = layers.BatchNormalization()
+        self.relu1 = layers.ReLU()
+
+        # 3x3 depthwise separable convolution
+        self.spatial_conv = layers.DepthwiseConv2D(
+                name='Bottleneck_spatial',
+                kernel_size=(3, 3),
+                strides=1,
+                use_bias=False,
+                activation=None,
+                padding='same'
+        )
+        self.bn2 = layers.BatchNormalization()
+        self.relu2 = layers.ReLU()
+
+        # 1x1 depthwise convolution, exit the bottleneck
+        self.channel_conv_2 = layers.Conv2D(
+                filters=out_width,
+                name='Bottleneck_exit',
+                kernel_size=(1, 1),
+                strides=1,
+                use_bias=False,
+                activation=None,
+        )
+        self.bn3 = layers.BatchNormalization()
+        self.relu3 = layers.ReLU()
+
+        # Merge operation to join residual + main paths
+        self.merge = layers.Add()
+
+    def call(self, inputs, training=False, **kwargs):
+        """
+        Runs the forward pass for this layer
+
+        Arguments:
+            input: input tensor(s)
+            training: boolean, whether or not
 
         Keyword Arguments:
-            Forwarded to tf.keras.Model
+            Forwarded to call() of each component layer.
+
+        Return:
+            Output of forward pass
         """
-        super().__init__(*args, **kwargs)
 
-        # Three residual convolution blocks
-        kernels = [(1, 1), (3, 3), (1, 1)]
-        feature_maps = [Ni // 4, Ni // 4, Ni]
-        self.residual_filters = [
-            ResnetBasic(N, K)
-            for N, K in zip(feature_maps, kernels)
-        ]
+        # Enter bottleneck, depthwise convolution
+        _ = self.bn1(inputs, training=training)
+        _ = self.relu1(_)
+        _ = self.channel_conv_1(_)
 
-        # Merge operation
-        self.merge = layers.Add()
+        # Spatial convolution, depthwise separable
+        _ = self.bn2(_, training=training)
+        _ = self.relu2(_)
+        _ = self.spatial_conv(_)
 
-    def call(self, inputs, **kwargs):
+        # Exit bottleneck, depthwise convolution
+        _ = self.bn3(_, training=training)
+        _ = self.relu3(_)
+        _ = self.channel_conv_2(_)
 
-        # Residual forward pass
-        res = inputs
-        for res_layer in self.residual_filters:
-            res = res_layer(res, **kwargs)
-
-        # Combine residual pass with identity
-        return self.merge([inputs, res], **kwargs)
-
-class SpecialBottleneck(Bottleneck):
-
-    def __init__(self, Ni, *args, **kwargs):
-
-        # Layers that also appear in standard bottleneck
-        super(SpecialBottleneck, self).__init__(Ni, *args, **kwargs)
-
-        # Add convolution layer along main path
-        self.main = layers.Conv2D(
-                Ni,
-                (1, 1),
-                padding='same',
-                activation=None,
-                use_bias=False)
-
-    def call(self, inputs, **kwargs):
-
-        # Residual forward pass
-        res = inputs
-        for res_layer in self.residual_filters:
-            res = res_layer(res, **kwargs)
-
-        # Convolution on main forward pass
-        main = self.main(inputs, **kwargs)
-
-        # Merge residual and main
-        return self.merge([main, res])
+        # Combine residual and main paths
+        return self.merge([inputs, _], **kwargs)
 
 class Downsample(tf.keras.Model):
+    """
+    Resnet style residual bottleneck block consisting of:
+        1. 1x1/1 depthwise convolution + BN + ReLU (bottlenecked)
+        2. 3x3/1 depthwise separable convolution + BN + ReLU (bottlenecked)
+        3. 1x1/1 depthwise convolution + BN + ReLU
+    """
 
-    def __init__(self, Ni, *args, **kwargs):
-        super(Downsample, self).__init__(*args, **kwargs)
+    def __init__(self, out_width, bottleneck=4, stride=2):
+        """
+        Constructs a downsample block with the final number of output
+        feature maps given by `out_width`. Stride of the spatial convolution
+        layer is given by `stride`. Take care to increase width appropriately
+        for a given spatial downsample.
 
-        # Three residual convolution blocks
-        kernels = [(1, 1), (3, 3), (1, 1)]
-        strides = [(2, 2), (1, 1), (1, 1)]
-        feature_maps = [Ni // 2, Ni // 2, 2*Ni]
+        The first two convolutions are bottlenecked according to `bottleneck`.
 
-        self.residual_filters = [
-            ResnetBasic(N, K, strides=S)
-            for N, K, S in zip(feature_maps, kernels, strides)
-        ]
+        Arguments:
+            out_width:  Positive integer, number of output feature maps.
 
-        # Convolution on main path
-        self.main = ResnetBasic(2*Ni, (1,1), strides=(2,2))
+            bottleneck: Positive integer, factor by which to bottleneck
+                        relative to `out_width`. Default 4.
 
-        # Merge operation for residual and main
+            stride:     Positive integer or tuple of positive integers giving
+                        the stride of the depthwise separable convolution layer.
+                        If a single value, row and col stride will be
+                        set to the given value. If a tuple, assign row and
+                        col stride from the tuple as (row, col).  Default 2.
+
+        """
+        super().__init__()
+
+        # 1x1 convolution, enter the bottleneck
+        self.channel_conv_1 = layers.Conv2D(
+                filters=out_width // bottleneck,
+                name='Downsample_enter',
+                kernel_size=(1, 1),
+                strides=1,
+                use_bias=False,
+                activation=None,
+        )
+        self.bn1 = layers.BatchNormalization()
+        self.relu1 = layers.ReLU()
+
+        # 3x3 depthwise separable spatial convolution
+        self.spatial_conv = layers.DepthwiseConv2D(
+                name='Downsample_conv',
+                kernel_size=(3, 3),
+                strides=stride,
+                use_bias=False,
+                activation=None,
+                padding='same'
+        )
+        self.bn2 = layers.BatchNormalization()
+        self.relu2 = layers.ReLU()
+
+        # 1x1 convolution, exit the bottleneck
+        self.channel_conv_2 = layers.Conv2D(
+                filters=out_width,
+                name='Downsample_exit',
+                kernel_size=(1, 1),
+                strides=1,
+                use_bias=False,
+                activation=None,
+        )
+        self.bn3 = layers.BatchNormalization()
+        self.relu3 = layers.ReLU()
+
+        # 3x3/2 convolution along main path
+        self.main = layers.Conv2D(
+                filters=out_width,
+                name='Downsample_main',
+                kernel_size=(3, 3),
+                strides=stride,
+                use_bias=False,
+                activation=None,
+                padding='same'
+        )
+        self.bn_main = layers.BatchNormalization()
+        self.relu_main = layers.ReLU()
+
+        # Merge operation to join residual + main paths
         self.merge = layers.Add()
 
-    def call(self, inputs, **kwargs):
+    def call(self, inputs, training=False, **kwargs):
+        """
+        Runs the forward pass for this layer
 
-        # Residual forward pass
-        res = inputs
-        for res_layer in self.residual_filters:
-            res = res_layer(res,**kwargs)
+        Arguments:
+            input: input tensor(s)
+            training: boolean, whether or not
 
-        # Main forward pass
-        main = self.main(inputs, **kwargs)
+        Keyword Arguments:
+            Forwarded to call() of each component layer.
 
-        # Merge residual and main
-        return self.merge([main, res])
+        Return:
+            Output of forward pass
+        """
+
+        # Enter bottleneck
+        _ = self.bn1(inputs, training=training)
+        _ = self.relu1(_)
+        _ = self.channel_conv_1(_)
+
+        # Spatial convolution
+        _ = self.bn2(_, training=training)
+        _ = self.relu2(_)
+        _ = self.spatial_conv(_)
+
+        # Exit bottleneck
+        _ = self.bn3(_, training=training)
+        _ = self.relu3(_)
+        _ = self.channel_conv_2(_)
+
+        # Main path with convolution
+        # TODO can we use first residual BN + ReLU here?
+        m = self.bn_main(inputs, training=training)
+        m = self.relu_main(m)
+        main = self.main(m)
+
+        # Combine residual and main paths
+        return self.merge([main, _])
 
 
-
-class ResnetHead(tf.keras.Model):
+class Head(tf.keras.Model):
     """
     Basic vision classification network head consisting of:
         1. 2D Global average pooling
         2. Fully connected layer + BN + ReLU
     """
 
-    def __init__(self, *args, **kwargs):
-        super(Resnet, self).__init__(*args, **kwargs)
+    def __init__(self, classes=100):
+        """
+        Arguments:
+            classes:    Positive integer, number of classes in the output of the
+                        fully connected layer.
 
-        self.global_avg = layers.GlobalAveragePooling2D(
-                name='GAP'
-        )
+        Keyword Arguments:
+            Forwarded to the dense layer.
+        """
+        super().__init__()
 
+        self.global_avg = layers.GlobalAveragePooling2D()
         self.dense = layers.Dense(
-                classes,
-                name='dense',
-                use_bias=True
+                units=classes,
+                use_bias=True,
+                activation=None,
+                name='Head_dense',
         )
 
     def call(self, inputs, **kwargs):
         _ = self.global_avg(inputs)
-        return self.dense(_, **kwargs)
+        return self.dense(_)
 
 
-class Resnet(tf.keras.Model):
-    """
-    Full network model consisting of the following layers, each
-    of which is paramterized in width and kernel size.
+class TinyImageNet(tf.keras.Model):
 
-        1. Tail
-        2. SpecialBottleneck
-        3. Some number of bottleneck + downsampling blocks
-        4. Global average pooling
-        5. Fully connected layer + ReLU
-    """
+    def __init__(self, levels, use_head=True, use_tail=True):
+        """
+        Arguments:
+            levels: List of positive integers. Each list entry denotes a level of
+                    downsampling, with the value of the i'th entry giving the number
+                    of times the bottleneck layer is repeated at the i;th level
 
-    def __init__(self, classes, filters, levels, *args, **kwargs):
-        super(Resnet, self).__init__(*args, **kwargs)
+            use_head: boolean, if true include a default network head
+            use_tail: boolean, if true include a default network tail
 
-        # Tail
-        self.tail = Tail(filters)
+        Keyword Arguments:
+            Forwarded to tf.keras.Model
+        """
+        super().__init__()
+        width = 32
 
-        # Special bottleneck layer with convolution on main path
-        self.level_0_special = SpecialBottleneck(filters)
-
-        # Lists to hold various layers
-        # Note: declare layer lists immediately before filling the list
-        # If self.blocks was declared before tail, the tail would appear
-        # after all layers in the list when using model.summary()
-        self.blocks = list()
+        # Use default tail if requested in params
+        self.tail = Tail(out_width=width) if use_tail else None
 
         # Loop through levels and their parameterized repeat counts
+        self.blocks = list()
         for level, repeats in enumerate(levels):
+
+            # Create `repeats` Bottleneck blocks and add to the block list
             for block in range(repeats):
-                # Append a bottleneck block for each repeat
-                name = 'bottleneck_%i_%i' % (level, block)
-                layer = Bottleneck(filters, name=name)
-                self.blocks.append(layer)
+                bottleneck_layer = Bottleneck(out_width=width)
+                self.blocks.append(bottleneck_layer)
 
-            # Downsample and double feature maps at end of level
-            name = 'downsample_%i' % (level)
-            layer = Downsample(filters, name=name)
-            self.blocks.append(layer)
-            filters *= 2
+            # Create a downsample layer that doubles width
+            # Default stride=2
+            downsample_layer = Downsample(out_width=2*width)
+            self.blocks.append(downsample_layer)
 
-        self.level2_batch_norm = layers.BatchNormalization(name='final_bn')
-        self.level2_relu = layers.ReLU(name='final_relu')
+            # Update `width` for the next iteration
+            width *= 2
 
-        self.head = ResnetHead()
+        self.final_bn = layers.BatchNormalization(name='final_bn')
+        self.final_relu = layers.ReLU(name='final_relu')
 
-    def call(self, inputs, **kwargs):
-        x = self.tail(inputs, **kwargs)
-        x = self.level_0_special(x)
+        # Use default head if requested in params
+        self.head = Head(classes=100) if use_head else None
+
+    def call(self, inputs, training=False, **kwargs):
+        """
+        Runs the forward pass for this layer
+
+        Arguments:
+            input: input tensor(s)
+            training: boolean, whether or not
+
+        Keyword Arguments:
+            Forwarded to call() of each component layer.
+
+        Return:
+            Output of forward pass
+        """
+        _ = self.tail(inputs, training=training) if self.tail else inputs
 
         # Loop over layers by level
         for layer in self.blocks:
-            x = layer(x, **kwargs)
+            _ = layer(_, training=training)
 
         # Finish up specials in level 2
-        x = self.level2_batch_norm(x, **kwargs)
-        x = self.level2_relu(x)
+        _ = self.final_bn(_, training=training)
+        _ = self.final_relu(_)
 
-        return self.head(x, **kwargs)
+        return self.head(_, **kwargs) if self.head else _
