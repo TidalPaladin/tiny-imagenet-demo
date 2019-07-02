@@ -1,12 +1,12 @@
 #!/bin/bash
-CONVERT="${PWD}/downsample.sh"
-THREADS=10
-GROUP_DIGIT=4
 
+# Import downsample function
 export SHELL=$(type -p bash)
-source ${CONVERT}
+source downsample.sh
+DOWNSAMPLE_CMD="downsample"
 
-# Examples per class in output dataset
+THREADS=30
+GROUP_DIGIT=3
 CLASS_SIZE=1000
 
 # Read source dir from args or use current directory
@@ -17,40 +17,44 @@ SRC_DIR=$(readlink -f "$1" || echo "${PWD}")
 DEST_DIR=$(readlink -f "$2" || echo "${PWD}/dataset")
 mkdir -p ${DEST_DIR} || (echo "Could not create dest dir"; exit 1)
 
-CLASS_FILE=$(readlink -f "${PWD}/class_list.txt")
-[ -f "${CLASS_FILE}" ] || (echo "Could not find class_list.txt"; exit 1)
+# Logging
+LOG_FILE="${DEST_DIR}/output.log"
+echo "Begin log file:" > ${LOG_FILE}
+print_log() {
+	printf '%s %s\n' "$(date -Iseconds)" "$1" | tee -a ${LOG_FILE}
+}
 
 # Group classes up to a numeric digit in class labels
-prefixes=$(grep -oE "n[0-9]{$GROUP_DIGIT}" ${CLASS_FILE} | uniq)
+prefixes=$(ls ${SRC_DIR} | grep -oE "n[0-9]{$GROUP_DIGIT}" | uniq)
 
+# Print operation description
+print_log "Source: ${SRC_DIR}"
+print_log "Destination: ${DEST_DIR}"
+print_log "Group by digit: ${GROUP_DIGIT}"
+print_log "Class size: ${CLASS_SIZE}"
+print_log "Output classes: $(echo ${prefixes} | wc -w)"
+
+print_log "Starting dataset generation..."
 for prefix in ${prefixes}
 do
 
 	# Class list matching current prefix
-	classes=$(grep -oE "${prefix}[0-9]*" ${CLASS_FILE})
+	classes=$(ls -1 ${SRC_DIR} | grep -E "${prefix}[0-9]*")
 	num_classes=$(echo "$classes" | wc -l)
-	echo "Processing $prefix: $num_classes classes"
 
 	# How many examples to take from each class
 	take=$((${CLASS_SIZE} / ${num_classes}))
 
+	# Make dest directory for examples aggregated by prefix
+	dest=${DEST_DIR}/${prefix}
+	mkdir -p ${dest} || (print_log "Could not create ${prefix} output dir"; exit 2)
+
 	for class in ${classes}
 	do
-		# Look for the class directory in original dataset
-		src=$(readlink -f ${SRC_DIR}/${class})
-		[ -d ${src} ] || (echo "${src} does not exist"; continue)
-
-		# Make dest directory for examples aggregated by prefix
-		dest="${DEST_DIR}/${prefix}"
-		mkdir -p ${dest} || (echo "Could not create ${prefix} output dir"; continue)
-
-		ls ${src} | grep 'JPEG' | head -n ${take} | parallel \
-			-r \
-			-j $THREADS \
-			downsample "$src/{}" "$dest/{}" || exit 2
-
-		echo "Processed $take examples from $class"
-
+		class_path="${SRC_DIR}/${class}"
+		line_fmt="%s\t${dest}/${class}_%d.JPEG"
+		awk_cmd="{printf(\"${line_fmt}\\n\",\$1,NR-1)}"
+		ls ${class_path}/*.JPEG | head -n ${take} | awk "${awk_cmd}"
 	done
-	echo "Finished prefix $prefix"
-done
+done | tee -a $LOG_FILE | parallel --bar --colsep '\t' -r -j $THREADS downsample '{1} {2}'
+print_log "Finished!"
