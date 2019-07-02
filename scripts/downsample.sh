@@ -3,7 +3,6 @@
 #-unsharp 1.5x1+0.7+0.02 \
 
 downsample() {
-	echo "$2"
 	src=$(readlink -f $1 || exit 1)
 	[ -f ${src} ] || exit 1
 
@@ -12,8 +11,6 @@ downsample() {
 
 	OUT_RES="64x64"
 	DENSITY=96
-
-	echo "${src} -> ${dest}"
 
 	convert \
 		${src} \
