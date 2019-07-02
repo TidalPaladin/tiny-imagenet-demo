@@ -3,8 +3,8 @@
 IMG_NAME='tiny-imagenet-demo'
 LIB_NAME='tin'
 
-DATA_SRC="/mnt/valak/documents/imagenet/ILSVRC/Data/CLS-LOC/train"
-DATA_DEST="/home/tidal/Documents/tiny-imagenet-demo/dataset"
+DATA_SRC="/mnt/iscsi/train"
+DATA_DEST="/mnt/iscsi/tiny_imagenet"
 DATA_IMG='tiny-imagenet-dataset'
 
 clean:
@@ -28,11 +28,11 @@ test:
 		${pytest_args} /test
 
 build-dataset:
-	docker build --tag=${DATA_IMG} scripts/
+	cd scripts && docker build --tag=${DATA_IMG} .
 
 dataset:
 	docker run -it \
 		-v /home/tidal/Documents/tiny-imagenet-demo/scripts:/app \
 		-v ${DATA_SRC}:/app/src \
 		-v ${DATA_DEST}:/app/dest \
-		${DATA_IMG} \
+		${DATA_IMG}
