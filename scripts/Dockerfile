@@ -6,5 +6,6 @@ COPY class_list.txt /app/
 
 RUN apk update
 RUN apk add --no-cache parallel bash
+WORKDIR /app
 ENTRYPOINT ["/bin/bash"]
-RUN ["/app/group.sh", "/app/src", "/app/dest"]
+CMD ["/app/group.sh", "/app/src", "/app/dest"]
