@@ -22,13 +22,13 @@ The following dependencies are required:
 
 These dependencies can be installed with
 
-```
+```shell
 pip install tensorflow-gpu==2.0.0-beta1 absl-py
 ```
 
 or in Google Colab with
 
-```
+```shell
 !pip install tensorflow-gpu==2.0.0-beta1 absl-py
 ```
 
@@ -71,3 +71,22 @@ You may optionally supply command line flags as follows:
 ```shell
 docker exec -it tiny-imagenet python /app/train.py --batch_size=64
 ```
+
+## Model Overview
+
+TODO Put a model.summary() call or other graphic here
+
+The model implementation is based on the Resnet family of residual
+vision networks and parameterized, allowing for easy adjustment of
+depth and width.
+
+TODO Put some metrics about how well it does on old Tiny ImageNet or
+custom Tiny ImageNet.
+
+The following model attributes are parameterized:
+
+1. Whether to use a default `7x7/2` tail, user supplied tail, or no tail.
+2. Whether to use a default head, user supplied head, or no head.
+3. The number of output classes (if using the default head).
+4. The number of downsampling levels, and the number of bottleneck layers within each level.
+5. The model width (by supplying a custom tail).
