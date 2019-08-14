@@ -1,15 +1,40 @@
 # Tiny ImageNet Demo
 
-This library implements vision classification network written in
-Tensorflow 2.0 for Tiny ImageNet.
+This library implements a vision classification network written in
+Tensorflow 2.0 for Tiny ImageNet. The intention is to provide a
+demonstration of Tensorflow 2.0's high level Keras APIs for
+implementing models and training pipelines.
 
-TODO Also included are scripts to generate customized variants of Tiny
-Imagenet using Imagemagick.
+Additionally, scripts are included to generate a downsampled version
+of ImageNet (Tiny ImageNet) that is suitable for training on commodity
+hardware or under time constraints.
 
-## Documentation of Model APIs
+## Prerequisites
 
-TODO Maybe generate documentation from Python docstrings?
+A Dockerfile with necessary dependencies is provided. You may also
+follow the instructions below for a manual install or to install
+on [Google Colab](https://colab.research.google.com/).
 
-## Example Training Pipelines
+The following dependencies are required:
 
-TODO
+1. [Tensorflow 2.0](https://www.tensorflow.org/beta/)
+2. [Abseil (for logging / flags)](https://abseil.io/docs/python/)
+
+These dependencies can be installed with
+
+```
+pip install tensorflow-gpu==2.0.0-beta1 absl-py
+```
+
+or in Google Colab with
+
+```
+!pip install tensorflow-gpu==2.0.0-beta1 absl-py
+```
+
+The following dependencies are optional:
+1. [Tensorboard (for visualization)](https://www.tensorflow.org/tensorboard/)
+
+
+
+
