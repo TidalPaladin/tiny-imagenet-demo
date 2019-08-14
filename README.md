@@ -35,6 +35,39 @@ or in Google Colab with
 The following dependencies are optional:
 1. [Tensorboard (for visualization)](https://www.tensorflow.org/tensorboard/)
 
+## Installation
+
+Installation is automated using docker-compose. Build the local
+Docker image with
+
+```
+docker-compose build tiny-imagenet
+```
+
+This will trigger a pull of all needed dependencies.
+
+## Usage
+
+If using the Docker image, start the container with
+
+```shell
+docker-compose up tiny-imagenet
+```
+
+to launch the container as a daemon (no log output).
+
+This will automatically launch Tensorboard, which should now be
+accessible by visiting `http://localhost:6006`.
 
 
+Next, start the training script as follows:
 
+```shell
+docker exec -it tiny-imagenet python /app/train.py
+```
+
+You may optionally supply command line flags as follows:
+
+```shell
+docker exec -it tiny-imagenet python /app/train.py --batch_size=64
+```
