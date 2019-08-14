@@ -35,6 +35,12 @@ flags.DEFINE_integer(
     'Batch size for training'
 )
 
+flags.DEFINE_integer(
+    'image_dim',
+    64,
+    'Dimension in pixels of the square training images'
+)
+
 flags.DEFINE_bool(
     'summary',
     False,
@@ -207,4 +213,10 @@ flags.register_validator(
     'resume',
     lambda v: v == None or os.path.isfile(v),
     message='--resume must point to an existing checkpoint file'
+)
+
+flags.register_validator(
+    'image_dim',
+    lambda v: v > 0,
+    message='--image_dim must be an int > 0'
 )
