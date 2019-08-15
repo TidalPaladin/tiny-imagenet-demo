@@ -26,13 +26,3 @@ test:
 		${IMG_NAME}:test \
 		--cov=/${LIB_NAME} \
 		${pytest_args} /test
-
-build-dataset:
-	cd scripts && docker build --tag=${DATA_IMG} .
-
-dataset:
-	docker run -it \
-		-v /home/tidal/Documents/tiny-imagenet-demo/scripts:/app \
-		-v ${DATA_SRC}:/app/src \
-		-v ${DATA_DEST}:/app/dest \
-		${DATA_IMG}
