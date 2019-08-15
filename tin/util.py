@@ -96,3 +96,19 @@ def clean_empty_dirs(path):
             logging.info('Removing empty directory: %s', p)
             p.rmdir()
         logging.debug('Ignoring non-empty checkpoint directory: %s', p)
+
+def get_last_checkpoint(checkpoint_dir):
+    """
+    Gets the filepath for the most recent checkpoint file
+    in `checkpoint_dir`. Assumes checkpoint filenames and
+    subdirectories were created using defaults given in `flags.py`
+    """
+
+    # Find directory of latest run
+    path = Path(checkpoint_dir)
+    latest_path = sorted(list(path.glob('20*')))[-1]
+
+    # Find latest checkpoint file
+    latest_checkpoint = sorted(list(latest_path.glob('*.hdf5')))[-1]
+
+    return str(latest_checkpoint.resolve())
