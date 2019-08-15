@@ -1,0 +1,11 @@
+version: '2.3'
+services:
+
+  tiny-imagenet-gen:
+    image: ./
+    volumes:
+      - ${SRC_DIR}:/data/src
+      - ${DEST_DIR}:/data/dest
+    environment:
+      - SRC_DIR
+      - DEST_DIR
