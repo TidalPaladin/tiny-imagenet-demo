@@ -236,7 +236,7 @@ class Downsample(layers.Layer):
 class TinyImageNetHead(layers.Layer):
     """
     Basic vision classification network head consisting of:
-        1. 1D Global average pooling
+        1. 2D Global average pooling
         2. Fully connected layer + BN + ReLU
     """
 
@@ -249,9 +249,9 @@ class TinyImageNetHead(layers.Layer):
         Keyword Arguments:
             Forwarded to the dense layer.
         """
-        super(ClassificationHead, self).__init__(**kwargs)
+        super(TinyImageNetHead, self).__init__(**kwargs)
 
-        self.global_avg = layers.GlobalAveragePooling1D()
+        self.global_avg = layers.GlobalAveragePooling2D()
 
         self.dense = layers.Dense(
                 units=num_classes,
@@ -315,13 +315,9 @@ class TinyImageNet(tf.keras.Model):
         self.final_bn = layers.BatchNormalization(name='bn')
         self.final_relu = layers.ReLU(name='relu')
 
-        if self.use_attn:
-            self.attention = MultiHeadAttention(d_model=512,
-                    num_heads=8, name='attn')
-
         # Use default head if requested in params
         if use_head == True:
-            self.head = ClassificationHead(num_classes=100)
+            self.head = TinyImageNetHead(num_classes=100)
         elif not use_head == None:
             self.head = use_head
         else:

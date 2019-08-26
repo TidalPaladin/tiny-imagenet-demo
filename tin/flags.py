@@ -12,12 +12,6 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    'glob',
-    'part-r-*',
-    'Shell glob pattern for TFRecord file matching'
-)
-
-flags.DEFINE_string(
     'artifacts_dir',
     os.environ.get('ARTIFACTS_DIR', ''),
     'Destination directory for checkpoints / Tensorboard logs'
@@ -45,6 +39,12 @@ flags.DEFINE_bool(
     'summary',
     False,
     'Print a model summary and exit'
+)
+
+flags.DEFINE_bool(
+    'speedrun',
+    False,
+    'Run without callbacks'
 )
 
 flags.DEFINE_bool(
@@ -79,7 +79,7 @@ flags.DEFINE_list(
 
 flags.DEFINE_integer(
     'classes',
-    200,
+    61,
     'Number of output classes if running in classification mode.'
 )
 
