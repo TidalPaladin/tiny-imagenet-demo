@@ -1,11 +1,21 @@
 version: '2.3'
+
 services:
 
-  tiny-imagenet-gen:
-    image: ./
+  mk_tiny_imagenet:
+    build: ./
+    image: mk_tiny_imagenet
+    container_name: mk_tiny_imagenet
+    tty: true
+    stdin_open: true
     volumes:
-      - ${SRC_DIR}:/data/src
-      - ${DEST_DIR}:/data/dest
+      - type: bind
+        source: ${SRC_DIR}
+        target: /data/src
+        read_only: true
+      - type: bind
+        source: ${DEST_DIR}
+        target: /data/dest
     environment:
-      - SRC_DIR
-      - DEST_DIR
+      - SRC_DIR=/data/src
+      - DEST_DIR=/data/dest
