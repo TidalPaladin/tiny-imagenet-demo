@@ -19,6 +19,11 @@ build:
 		--build-arg cache=${shell date +%Y-%m-%d:%H%M:%s}  \
 		.
 
+train:
+	docker run -it \
+		-v ${PWD}:/app \
+		${IMG_NAME}
+
 test:
 	docker run -it \
 		-v ${PWD}/test:/test \
