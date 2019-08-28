@@ -80,11 +80,60 @@ docker-compose run tiny-imagenet --helpfull
 
 ## Model Overview
 
-TODO Put a model.summary() call or other graphic here
-
 The model implementation is based on the Resnet family of residual
 vision networks and parameterized, allowing for easy adjustment of
-depth and width.
+depth and width. The default model as is follows:
+
+```
+Model: "tiny_image_net"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+tail (Tail)                  (None, 64, 64, 32)        4704
+_________________________________________________________________
+bottleneck (Bottleneck)      (None, 64, 64, 32)        744
+_________________________________________________________________
+bottleneck_1 (Bottleneck)    (None, 64, 64, 32)        744
+_________________________________________________________________
+bottleneck_2 (Bottleneck)    (None, 64, 64, 32)        744
+_________________________________________________________________
+downsample (Downsample)      (None, 32, 32, 64)        20432
+_________________________________________________________________
+bottleneck_3 (Bottleneck)    (None, 32, 32, 64)        2512
+_________________________________________________________________
+bottleneck_4 (Bottleneck)    (None, 32, 32, 64)        2512
+_________________________________________________________________
+bottleneck_5 (Bottleneck)    (None, 32, 32, 64)        2512
+_________________________________________________________________
+bottleneck_6 (Bottleneck)    (None, 32, 32, 64)        2512
+_________________________________________________________________
+bottleneck_7 (Bottleneck)    (None, 32, 32, 64)        2512
+_________________________________________________________________
+bottleneck_8 (Bottleneck)    (None, 32, 32, 64)        2512
+_________________________________________________________________
+downsample_1 (Downsample)    (None, 16, 16, 128)       80800
+_________________________________________________________________
+bottleneck_9 (Bottleneck)    (None, 16, 16, 128)       9120
+_________________________________________________________________
+bottleneck_10 (Bottleneck)   (None, 16, 16, 128)       9120
+_________________________________________________________________
+bottleneck_11 (Bottleneck)   (None, 16, 16, 128)       9120
+_________________________________________________________________
+bottleneck_12 (Bottleneck)   (None, 16, 16, 128)       9120
+_________________________________________________________________
+downsample_2 (Downsample)    (None, 8, 8, 256)         321344
+_________________________________________________________________
+bn (BatchNormalization)      (None, 8, 8, 256)         1024
+_________________________________________________________________
+relu (ReLU)                  (None, 8, 8, 256)         0
+_________________________________________________________________
+head (TinyImageNetHead)      (None, 61)                15677
+=================================================================
+Total params: 497,765
+Trainable params: 493,653
+Non-trainable params: 4,112
+_________________________________________________________________
+```
 
 TODO Put some metrics about how well it does on old Tiny ImageNet or
 custom Tiny ImageNet.
