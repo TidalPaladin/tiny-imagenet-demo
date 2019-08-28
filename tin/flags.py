@@ -1,4 +1,6 @@
 #!python
+"""Provides command line flags to customize the training pipleine"""
+
 import os
 from absl import app
 from absl import flags
@@ -8,13 +10,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string(
     'src',
     os.environ.get('SRC_DIR', ''),
-    'Dataset source directory'
-)
-
-flags.DEFINE_string(
-    'glob',
-    'part-r-*',
-    'Shell glob pattern for TFRecord file matching'
+    'Dataset source directory. Target of ImageDataGenerator.flow_from_directory'
 )
 
 flags.DEFINE_string(
@@ -26,7 +22,8 @@ flags.DEFINE_string(
 flags.DEFINE_bool(
     'dry',
     False,
-    'If true, dont write Tensorboard logs or checkpoint files'
+    ('If true, dont write Tensorboard logs or checkpoint files. '
+    'Use this to experiment without worrying about writing artifacts')
 )
 
 flags.DEFINE_integer(
@@ -44,49 +41,28 @@ flags.DEFINE_integer(
 flags.DEFINE_bool(
     'summary',
     False,
-    'Print a model summary and exit'
+    ('Print/save a model layer summary and exit. '
+    'Model summary will be saved in artifact directory')
 )
 
 flags.DEFINE_bool(
     'tune',
     False,
-    'Run one epoch for each hyperparam setting and exit'
-)
-
-flags.DEFINE_integer(
-    'shuffle_size',
-    1024,
-    'Size of the shuffle buffer. If 0, do not shuffle input data.'
-)
-
-flags.DEFINE_bool(
-    'prefetch',
-    True,
-    'Whether to prefetch TF dataset'
-)
-
-flags.DEFINE_bool(
-    'repeat',
-    True,
-    'Repeat the input dataset'
+    'Reserved for future use. Hyperparameter tuning'
 )
 
 flags.DEFINE_list(
     'levels',
-    [4, 5, 6, 4],
-    'Levels to use in the TraderNet encoder architecture.'
+    [3, 6, 4],
+    ('Levels to use in the TraderNet encoder architecture. '
+    'ie. --levels=3,6,4 for 3 levels of downsampling with 3,6,4'
+    'bottleneck blocks for the respective levels')
 )
 
 flags.DEFINE_integer(
     'classes',
-    200,
+    61,
     'Number of output classes if running in classification mode.'
-)
-
-flags.DEFINE_string(
-    'label',
-    'label',
-    'TFRecord feature to treat as training label'
 )
 
 flags.DEFINE_integer(
@@ -95,16 +71,10 @@ flags.DEFINE_integer(
     'Number of training epochs'
 )
 
-flags.DEFINE_integer(
-    'steps_per_epoch',
-    4000,
-    'Number of batches to include per epoch'
-)
-
-flags.DEFINE_integer(
-    'validation_size',
-    1000,
-    'Number of examples to include in the validation set'
+flags.DEFINE_float(
+    'validation_split',
+    0.05,
+    'Fraction of dataset to reserve for validation'
 )
 
 flags.DEFINE_float(
@@ -162,12 +132,6 @@ flags.register_validator(
 )
 
 flags.register_validator(
-    'shuffle_size',
-    lambda v: v >= 0,
-    message='--shuffle_size must an int >= 0'
-)
-
-flags.register_validator(
     'levels',
     lambda v: len(v) > 0,
     message='--levels must be a non-empty list of integers'
@@ -186,15 +150,15 @@ flags.register_validator(
 )
 
 flags.register_validator(
-    'steps_per_epoch',
+    'validation_split',
     lambda v: v >= 0,
-    message='--steps_per_epoch must be an integer >= 0'
+    message='--validation_split must be a float on interval (0, 1)'
 )
 
 flags.register_validator(
-    'validation_size',
-    lambda v: v >= 0,
-    message='--validation_size must be an integer >= 0'
+    'validation_split',
+    lambda v: v > 0,
+    message='--image_dim must be an int > 0'
 )
 
 flags.register_validator(

@@ -6,17 +6,23 @@ services:
     build:
       context: ./
       args:
-        upstream: 2.0.0b1-gpu-py3
-    container_name: trader
-    networks: [sparknet]
+        upstream: 2.0.0rc0-gpu-py3
+    container_name: tiny-imagenet
+    tty: true
+    stdin_open: true
+    volumes:
+      - type: bind
+        source: ${SRC_DIR}
+        target: /data/src
+        read_only: true
+      - type: bind
+        source: ${ARTIFACT_DIR}
+        target: /artifacts
     ports:
       - 6006:6006
     runtime: nvidia
     # Env vars are read from .env file
-    volumes:
-      - ${DEST_DIR}:/data
-      - ${ARTIFACT_DIR}:/artifacts # Log files / model checkpoints go here
     environment:
-      - CUDA_VISIBLE_DEVICES # Passthrough from .env file to expose only one GPU
-      - SRC_DIR=/data/tfrecords
+      - CUDA_VISIBLE_DEVICES=1
+      - SRC_DIR=/data/src
       - ARTIFACTS_DIR=/artifacts
