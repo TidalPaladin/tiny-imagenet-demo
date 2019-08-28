@@ -156,9 +156,9 @@ flags.register_validator(
 )
 
 flags.register_validator(
-    'validation_size',
-    lambda v: v >= 0,
-    message='--validation_size must be an integer >= 0'
+    'validation_split',
+    lambda v: v > 0,
+    message='--image_dim must be an int > 0'
 )
 
 flags.register_validator(
