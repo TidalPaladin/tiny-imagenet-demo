@@ -19,6 +19,8 @@ The following dependencies are required:
 
 1. [Tensorflow 2.0](https://www.tensorflow.org/versions/r2.0/api_docs)
 2. [Abseil (for logging / flags)](https://abseil.io/docs/python/)
+3. Pillow (for `keras.ImageDataGenerator`)
+4. Sci-py (for `keras.ImageDataGenerator`)
 
 These dependencies can be installed with
 
