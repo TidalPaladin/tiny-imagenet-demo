@@ -48,9 +48,7 @@ flags.DEFINE_bool(
 flags.DEFINE_bool(
     'tune',
     False,
-    'Run one epoch for each hyperparam setting and exit'
-)
-
+    'Reserved for future use. Hyperparameter tuning'
 )
 
 flags.DEFINE_list(
