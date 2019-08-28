@@ -124,6 +124,8 @@ def main(argv):
         out_path = os.path.join(FLAGS.artifacts_dir, 'summary.txt')
         model.summary()
         save_summary(model, out_path)
+        logging.info("Exiting after printing model summary")
+        sys.exit(0)
 
     checkpoint_dir = os.path.join(FLAGS.artifacts_dir, 'checkpoint')
     clean_empty_dirs(checkpoint_dir)
