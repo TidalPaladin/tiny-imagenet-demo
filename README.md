@@ -145,3 +145,8 @@ The following model attributes are parameterized:
 3. The number of output classes (if using the default head).
 4. The number of downsampling levels, and the number of bottleneck layers within each level.
 5. The model width (by supplying a custom tail).
+
+## Dataset
+
+TODO Add notes about dataset once final bugs are worked out. Currently
+61 classes with 1000 examples each.
