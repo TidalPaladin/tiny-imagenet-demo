@@ -6,7 +6,7 @@ services:
     build:
       context: ./
       args:
-        upstream: 2.0.0b1-gpu-py3
+        upstream: 2.0.0rc0-gpu-py3
     container_name: tiny-imagenet
     tty: true
     stdin_open: true

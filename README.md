@@ -17,19 +17,19 @@ on [Google Colab](https://colab.research.google.com/).
 
 The following dependencies are required:
 
-1. [Tensorflow 2.0](https://www.tensorflow.org/beta/)
+1. [Tensorflow 2.0](https://www.tensorflow.org/versions/r2.0/api_docs)
 2. [Abseil (for logging / flags)](https://abseil.io/docs/python/)
 
 These dependencies can be installed with
 
 ```shell
-pip install tensorflow-gpu==2.0.0-beta1 absl-py
+pip install tensorflow-gpu==2.0.0-rc0 absl-py
 ```
 
 or in Google Colab with
 
 ```shell
-!pip install tensorflow-gpu==2.0.0-beta1 absl-py
+!pip install tensorflow-gpu==2.0.0-rc0 absl-py
 ```
 
 The following dependencies are optional:

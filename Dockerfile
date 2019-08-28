@@ -1,4 +1,4 @@
-ARG upstream=2.0.0b1-gpu-py3
+ARG upstream=2.0.0rc0-gpu-py3
 FROM tensorflow/tensorflow:${upstream} as base
 
 RUN pip install Pillow==6.1.0 scipy==1.3.1
