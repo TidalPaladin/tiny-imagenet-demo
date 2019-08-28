@@ -50,28 +50,32 @@ This will trigger a pull of all needed dependencies.
 
 ## Usage
 
-If using the Docker image, start the container with
+If using the Docker image, first build the image with
 
 ```shell
-docker-compose up tiny-imagenet
+docker-compose build tiny-imagenet
 ```
 
-to launch the container as a daemon (no log output).
+Next, run the training pipeline with
 
-This will automatically launch Tensorboard, which should now be
+```shell
+docker-compose run tiny-imagenet
+```
+
+This will automatically launch Tensorboard in the container, which should now be
 accessible by visiting `http://localhost:6006`.
-
-
-Next, start the training script as follows:
-
-```shell
-docker exec -it tiny-imagenet python /app/train.py
-```
 
 You may optionally supply command line flags as follows:
 
+
 ```shell
-docker exec -it tiny-imagenet python /app/train.py --batch_size=64
+docker-compose run tiny-imagenet --dry --levels=3,5,7
+```
+
+To see all available command line flags, run
+
+```shell
+docker-compose run tiny-imagenet --helpfull
 ```
 
 ## Model Overview
