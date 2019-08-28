@@ -53,7 +53,7 @@ flags.DEFINE_bool(
 
 flags.DEFINE_list(
     'levels',
-    [4, 5, 6, 4],
+    [3, 6, 4],
     ('Levels to use in the TraderNet encoder architecture. '
     'ie. --levels=3,6,4 for 3 levels of downsampling with 3,6,4'
     'bottleneck blocks for the respective levels')
