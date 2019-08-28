@@ -140,7 +140,7 @@ custom Tiny ImageNet.
 
 The following model attributes are parameterized:
 
-1. Whether to use a default `7x7/2` tail, user supplied tail, or no tail.
+1. Whether to use a default `7x7/1` tail, user supplied tail, or no tail.
 2. Whether to use a default head, user supplied head, or no head.
 3. The number of output classes (if using the default head).
 4. The number of downsampling levels, and the number of bottleneck layers within each level.
