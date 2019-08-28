@@ -93,21 +93,15 @@ def train_model(model, train, validate, initial_epoch):
 
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
 
-    validation_steps=FLAGS.validation_size // FLAGS.batch_size
-    #model_callbacks = callbacks + [hp.KerasCallback(hparam_dir, hparams)]
-    model_callbacks = callbacks
-    steps_per_epoch=FLAGS.steps_per_epoch
-
-
     fit_args = {
         'generator': train,
         'epochs': FLAGS.epochs,
         'validation_data': validate,
-        'validation_steps': 100,
-        'callbacks': model_callbacks,
+        'callbacks': callbacks,
         'initial_epoch': initial_epoch
     }
     pretty_args = json.dumps({k: str(v) for k, v in fit_args.items()}, indent=2)
+
     logging.info("Fitting model with args: \n%s", pretty_args)
     history = model.fit_generator(**fit_args)
 
@@ -150,7 +144,7 @@ def main(argv):
         logging.info("Starting from epoch %i", initial_epoch+1)
 
     global callbacks
-    callbacks = get_callbacks(FLAGS) if not FLAGS.speedrun else []
+    callbacks = get_callbacks(FLAGS) if not FLAGS.dry else []
 
     train, validate = preprocess()
     train_model(model, train, validate, initial_epoch)
