@@ -9,6 +9,9 @@ Additionally, scripts are included to generate a downsampled version
 of ImageNet (Tiny ImageNet) that is suitable for training on commodity
 hardware or under time constraints.
 
+Model / training code can be found in the [tin](./tin) directory. TODO
+maybe rename this path?
+
 ## Prerequisites
 
 A Dockerfile with necessary dependencies is provided. You may also
