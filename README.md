@@ -25,13 +25,13 @@ The following dependencies are required:
 These dependencies can be installed with
 
 ```shell
-pip install tensorflow-gpu==2.0.0-rc0 absl-py
+pip install tensorflow-gpu==2.0.0-rc0 absl-py Pillow==6.1.0 scipy==1.3.1
 ```
 
 or in Google Colab with
 
 ```shell
-!pip install tensorflow-gpu==2.0.0-rc0 absl-py
+!pip install tensorflow-gpu==2.0.0-rc0 absl-py Pillow==6.1.0 scipy==1.3.1
 ```
 
 The following dependencies are optional:
