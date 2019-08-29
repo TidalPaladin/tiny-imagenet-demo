@@ -9,6 +9,9 @@ Additionally, scripts are included to generate a downsampled version
 of ImageNet (Tiny ImageNet) that is suitable for training on commodity
 hardware or under time constraints.
 
+Model / training code can be found in the [tin](./tin) directory. TODO
+maybe rename this path?
+
 ## Prerequisites
 
 A Dockerfile with necessary dependencies is provided. You may also
@@ -25,17 +28,20 @@ The following dependencies are required:
 These dependencies can be installed with
 
 ```shell
-pip install tensorflow-gpu==2.0.0-rc0 absl-py
+pip install tensorflow-gpu==2.0.0-rc0 absl-py Pillow==6.1.0 scipy==1.3.1
 ```
 
 or in Google Colab with
 
 ```shell
-!pip install tensorflow-gpu==2.0.0-rc0 absl-py
+!pip install tensorflow-gpu==2.0.0-rc0 absl-py Pillow==6.1.0 scipy==1.3.1
 ```
 
 The following dependencies are optional:
 1. [Tensorboard (for visualization)](https://www.tensorflow.org/tensorboard/)
+
+TODO May need extra install steps for nvidia-docker to enable
+Dockerized GPU training. Explore this
 
 ## Installation
 
