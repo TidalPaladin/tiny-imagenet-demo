@@ -37,6 +37,9 @@ or in Google Colab with
 The following dependencies are optional:
 1. [Tensorboard (for visualization)](https://www.tensorflow.org/tensorboard/)
 
+TODO May need extra install steps for nvidia-docker to enable
+Dockerized GPU training. Explore this
+
 ## Installation
 
 Installation is automated using docker-compose. Build the local
