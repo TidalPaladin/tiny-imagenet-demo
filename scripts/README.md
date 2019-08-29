@@ -59,6 +59,9 @@ To silence the citation notice: run 'parallel --bibtex'.
 
 The status indicator is provided by GNU `parallel` which also handles efficient parallelization of image downsampling. An estimated time remaining is also given.
 
+**Note** the source / destination directores in the above example are
+filepaths within the Docker container (mountpoints).
+
 ## Components
 
 * `downsample.sh file_in file_out` uses ImageMagick to downsample an
@@ -70,7 +73,7 @@ The status indicator is provided by GNU `parallel` which also handles efficient 
 
 ## Future Work
 
-The simplistic approach of reducing the number of output classes by grouping by Synset label digits is not optimal. In some cases the groupings were logical, but in other cases they were horrible (things like sea cucumber and bird species being grouped together). 
+The simplistic approach of reducing the number of output classes by grouping by Synset label digits is not optimal. In some cases the groupings were logical, but in other cases they were horrible (things like sea cucumber and bird species being grouped together).
 
 Steps should be taken to:
 1. Decouple downsampling and GNU parallel's operation from the class grouping strategy. The tight coupling that exists now will make it difficult to try alternative grouping strategies
