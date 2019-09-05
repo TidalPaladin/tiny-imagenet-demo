@@ -7,6 +7,11 @@ from tensorflow.keras import layers
 from tensorflow.keras import Model
 
 class Tail(layers.Layer):
+    """
+    A 7x7/2 tail with padding such that spatial output dimentions equal
+    spatial input dimensions (i.e. M_r = L_r, M_c = L_c). Does not include
+    batch normalization, bias, or an activation.
+    """
 
     def __init__(self, out_width=32):
         """
