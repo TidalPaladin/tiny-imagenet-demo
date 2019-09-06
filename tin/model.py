@@ -67,8 +67,8 @@ class Bottleneck(layers.Layer):
         """
         super().__init__()
 
-        # 1x1 depthwise convolution, enter the bottleneck
-        self.channel_conv_1 = layers.Conv2D(
+        # 1x1 depthwise conv, enter bottleneck
+        self.conv1 = layers.Conv2D(
                 filters=out_width // bottleneck,
                 name='Bottleneck_enter',
                 kernel_size=1,
@@ -79,10 +79,10 @@ class Bottleneck(layers.Layer):
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
 
-        # 3x3 depthwise separable convolution
-        self.spatial_conv = layers.SeparableConv2D(
+        # 3x3 depthwise separable conv, exit bottleneck
+        self.conv2 = layers.SeparableConv2D(
                 filters=out_width,
-                name='Bottleneck_conv',
+                name='Bottleneck_exit',
                 kernel_size=3,
                 strides=1,
                 use_bias=False,
@@ -114,12 +114,12 @@ class Bottleneck(layers.Layer):
         # Enter bottleneck, depthwise convolution
         _ = self.bn1(inputs, training=training)
         _ = self.relu1(_)
-        _ = self.channel_conv_1(_)
+        _ = self.conv1(_)
 
         # Spatial convolution, depthwise separable
         _ = self.bn2(_, training=training)
         _ = self.relu2(_)
-        _ = self.spatial_conv(_)
+        _ = self.conv2(_)
 
         # Combine residual and main paths
         return self.merge([inputs, _], **kwargs)
@@ -156,7 +156,7 @@ class Downsample(layers.Layer):
         """
         super().__init__()
 
-        # 1x1 convolution, enter the bottleneck
+        # 1x1 convolution, enter bottleneck (residual)
         self.channel_conv_1 = layers.Conv2D(
                 filters=out_width // bottleneck,
                 name='Downsample_enter',
@@ -168,7 +168,7 @@ class Downsample(layers.Layer):
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
 
-        # 3x3 depthwise separable spatial convolution
+        # 3x3 depthwise separable conv, exit bottleneck (residual)
         self.spatial_conv = layers.SeparableConv2D(
                 filters=out_width,
                 name='Downsample_conv',
@@ -181,8 +181,7 @@ class Downsample(layers.Layer):
         self.bn2 = layers.BatchNormalization()
         self.relu2 = layers.ReLU()
 
-
-        # 3x3/2 convolution along main path
+        # 3x3/2 conv (main)
         self.main = layers.Conv2D(
                 filters=out_width,
                 name='Downsample_main',
