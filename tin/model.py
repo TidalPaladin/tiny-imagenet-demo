@@ -7,8 +7,9 @@ from tensorflow.keras import layers
 from tensorflow.keras import Model
 
 class Tail(layers.Layer):
+    """ Basic tail consisting of a 7x7/1 separable convolution """
 
-    def __init__(self, out_width=32):
+    def __init__(self, out_width=32, depth_multiplier=3):
         """
         Arguments:
             out_width:  Number of output feature maps. Default 32.
