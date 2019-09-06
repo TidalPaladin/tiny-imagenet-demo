@@ -1,6 +1,8 @@
 #!python3
+"""
+Provides utility functions for Tiny ImageNet training pipeline
+"""
 
-#!python3
 import os
 import sys
 import itertools
@@ -15,10 +17,13 @@ import tensorflow.feature_column as fc
 from tensorboard.plugins.hparams import api as hp
 from absl import logging
 
+# Used for directory / file names
 DATE = datetime.now().strftime("%Y%m%d-%H%M%S")
 
 def get_callbacks(FLAGS):
+    """ Gets model callbacks based on CLI flags """
 
+    # Join checkpoint / Tensorboard log directories
     checkpoint_dir = os.path.join(FLAGS.artifacts_dir, 'checkpoint', DATE)
     logging.info("Model checkpoint dir: %s", checkpoint_dir)
     tb_dir = os.path.join(FLAGS.artifacts_dir, 'tblogs')
@@ -44,10 +49,12 @@ def get_callbacks(FLAGS):
     logging.info("EarlyStopping: %s", learnrate_args)
     stopping_cb = tf.keras.callbacks.EarlyStopping(**stopping_args)
 
-    # Skip IO callbacks if requested
+    # Skip IO callbacks if requested, return callback list
     if FLAGS.dry:
         return [learnrate_cb, stopping_cb ]
 
+    # Make TB / checkpoint dirs
+    # (after FLAGS.dry early return to avoid empty dir buildup)
     os.makedirs(tb_dir, exist_ok=True)
     os.makedirs(checkpoint_dir, exist_ok=True)
 
@@ -70,13 +77,13 @@ def get_callbacks(FLAGS):
     file_writer = tf.summary.create_file_writer(tb_dir + "/metrics")
     file_writer.set_as_default()
 
+    # Return callback list
     callbacks = [
         chkpt_cb,
         tensorboard_cb,
         learnrate_cb,
         stopping_cb
     ]
-
     return callbacks
 
 def save_summary(model, filepath, line_length=80):
