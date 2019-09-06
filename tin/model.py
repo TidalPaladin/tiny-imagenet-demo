@@ -13,8 +13,10 @@ class Tail(layers.Layer):
         """
         Arguments:
             out_width:  Number of output feature maps. Default 32.
-            depth_multiplier:   multiply channels_in by depth_multiplier at the
-                                depthwise stage. Default 3.
+
+            depth_multiplier:
+                        Multiply channels_in by depth_multiplier at the
+                        depthwise stage. Default 3.
         """
         super().__init__()
 
@@ -54,21 +56,21 @@ class Tail(layers.Layer):
 class Bottleneck(layers.Layer):
     """
     Resnet style residual bottleneck block consisting of:
-        1. 1x1/1 channel convolution, Ni / 4 bottleneck
-        2. 3x3/1 spatial convolution
-        3. 1x1/1 channel convolution, exit width bottleneck
+        1. 1x1/1 pointwise bottleneck convolution (+BN + ReLU)
+        2. 3x3/1 separable conv to exit bottleneck (+BN + ReLU)
     """
 
     def __init__(self, out_width, depth_multiplier=4):
         """
         Constructs a bottleneck block with the final number of output
         feature maps given by `out_width`. Bottlenecked layers will have
-        output feature map count given by `out_width // bottleneck`.
+        output feature map count given by `out_width // depth_multiplier`.
 
         Arguments:
-            out_width: Positive integer, number of output feature maps.
+            out_width:  Positive integer, number of output feature maps.
 
-            depth_multiplier: Positive integer, factor by which to bottleneck
+            depth_multiplier:
+                        Positive integer, factor by which to bottleneck
                         relative to `out_width`. Default 4.
         """
         super().__init__()
@@ -136,10 +138,10 @@ class Bottleneck(layers.Layer):
 
 class Downsample(layers.Layer):
     """
-    Resnet style residual bottleneck block consisting of:
-        1. 1x1/1 depthwise convolution + BN + ReLU (bottlenecked)
-        2. 3x3/1 depthwise separable convolution + BN + ReLU (bottlenecked)
-        3. 1x1/1 depthwise convolution + BN + ReLU
+    Resnet style residual downsampling block consisting of:
+        1. 1x1/1 pointwise bottleneck convolution (+BN + ReLU)
+        2. 3x3/2 separable conv to exit bottleneck (with downsampling)
+        3. 3x3/2 separable conv along main path (no bottlenecking)
     """
 
     def __init__(self, out_width, depth_multiplier=4, stride=2):
@@ -154,7 +156,8 @@ class Downsample(layers.Layer):
         Arguments:
             out_width:  Positive integer, number of output feature maps.
 
-            depth_multiplier: Positive integer, factor by which to bottleneck
+            depth_multiplier:
+                        Positive integer, factor by which to bottleneck
                         relative to `out_width`. Default 4.
 
             stride:     Positive integer or tuple of positive integers giving
@@ -247,7 +250,7 @@ class TinyImageNetHead(layers.Layer):
     """
     Basic vision classification network head consisting of:
         1. 2D Global average pooling
-        2. Fully connected layer + BN + ReLU
+        2. Fully connected layer + bias (no activation)
     """
 
     def __init__(self, num_classes, **kwargs):
@@ -274,12 +277,38 @@ class TinyImageNetHead(layers.Layer):
 
 
     def call(self, inputs, training=False, **kwargs):
+        """
+        Runs the forward pass for this layer
+
+        Arguments:
+            input: input tensor(s)
+            training: boolean, whether or not
+
+        Keyword Arguments:
+            Forwarded to call() of each component layer.
+
+        Return:
+            Output of forward pass
+        """
         _ = self.global_avg(inputs)
         _ = self.dense(_)
+
+        # Apply softmax if not training, otherwise return unscaled logits
+        # In training, use softmax + cross entropy with `from_logits=True`
+        #   in order to exploit numerically stable result of combined op
         _ = self.softmax(_) if not training else _
         return _
 
 class TinyImageNet(tf.keras.Model):
+    """
+    Model subclass implementing dominant object detection for Tiny ImageNet.
+
+    Information:
+     - Inputs are expected to follow Tensorflow's default channel ordering (`channels_last`).
+     - Default parameterizations are aimed at 61 class classification with 64x64x3 inputs.
+     - Levels of downsampling and bottleneck repeats per level is parameterized
+     - Inclusion of default, custom or no head / tail is parameterized
+    """
 
     def __init__(self, levels, use_head=True, use_tail=True):
         """
@@ -289,6 +318,7 @@ class TinyImageNet(tf.keras.Model):
                     of times the bottleneck layer is repeated at the i;th level
 
             use_head: boolean, if true include a default network head
+
             use_tail: boolean, if true include a default network tail
 
         Keyword Arguments:
@@ -297,7 +327,7 @@ class TinyImageNet(tf.keras.Model):
         super().__init__()
         width = 32
 
-        # Use default tail if requested in params
+        # Use default / custom / no tail based on `use_tail`
         if use_tail == True:
             self.tail = Tail(out_width=width)
         elif not use_tail == None:
@@ -325,7 +355,7 @@ class TinyImageNet(tf.keras.Model):
         self.final_bn = layers.BatchNormalization(name='bn')
         self.final_relu = layers.ReLU(name='relu')
 
-        # Use default head if requested in params
+        # Use default / custom / no head based on `use_head`
         if use_head == True:
             self.head = TinyImageNetHead(num_classes=100)
         elif not use_head == None:
@@ -354,7 +384,7 @@ class TinyImageNet(tf.keras.Model):
         for layer in self.blocks:
             _ = layer(_, training=training)
 
-        # Finish up last level
+        # Finish up BN + ReLU on last level
         _ = self.final_bn(_, training=training)
         _ = self.final_relu(_)
 
