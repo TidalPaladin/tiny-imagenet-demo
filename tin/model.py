@@ -281,7 +281,7 @@ class TinyImageNetHead(layers.Layer):
 
 class TinyImageNet(tf.keras.Model):
 
-    def __init__(self, levels, use_head=True, use_tail=True):
+    def __init__(self, levels, use_head=True, use_tail=True, width=32):
         """
         Arguments:
             levels: List of positive integers. Each list entry denotes a level of
@@ -291,11 +291,12 @@ class TinyImageNet(tf.keras.Model):
             use_head: boolean, if true include a default network head
             use_tail: boolean, if true include a default network tail
 
+            width: int, expected number of feature maps at tail output
+
         Keyword Arguments:
             Forwarded to tf.keras.Model
         """
         super().__init__()
-        width = 32
 
         # Use default tail if requested in params
         if use_tail == True:
