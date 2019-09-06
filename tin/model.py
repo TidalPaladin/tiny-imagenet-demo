@@ -310,7 +310,9 @@ class TinyImageNet(tf.keras.Model):
      - Inclusion of default, custom or no head / tail is parameterized
     """
 
-    def __init__(self, levels, use_head=True, use_tail=True):
+    NUM_CLASSES = 61
+
+    def __init__(self, levels, use_head=True, use_tail=True, width=32):
         """
         Arguments:
             levels: List of positive integers. Each list entry denotes a level of
@@ -321,11 +323,12 @@ class TinyImageNet(tf.keras.Model):
 
             use_tail: boolean, if true include a default network tail
 
+            width: int, expected number of feature maps at tail output
+
         Keyword Arguments:
             Forwarded to tf.keras.Model
         """
         super().__init__()
-        width = 32
 
         # Use default / custom / no tail based on `use_tail`
         if use_tail == True:
@@ -357,7 +360,7 @@ class TinyImageNet(tf.keras.Model):
 
         # Use default / custom / no head based on `use_head`
         if use_head == True:
-            self.head = TinyImageNetHead(num_classes=100)
+            self.head = TinyImageNetHead(num_classes=TinyImageNet.NUM_CLASSES)
         elif not use_head == None:
             self.head = use_head
         else:
