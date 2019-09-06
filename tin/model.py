@@ -281,6 +281,8 @@ class TinyImageNetHead(layers.Layer):
 
 class TinyImageNet(tf.keras.Model):
 
+    NUM_CLASSES = 61
+
     def __init__(self, levels, use_head=True, use_tail=True, width=32):
         """
         Arguments:
@@ -328,7 +330,7 @@ class TinyImageNet(tf.keras.Model):
 
         # Use default head if requested in params
         if use_head == True:
-            self.head = TinyImageNetHead(num_classes=100)
+            self.head = TinyImageNetHead(num_classes=TinyImageNet.NUM_CLASSES)
         elif not use_head == None:
             self.head = use_head
         else:
