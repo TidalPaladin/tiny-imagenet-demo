@@ -53,7 +53,7 @@ class Bottleneck(layers.Layer):
         3. 1x1/1 channel convolution, exit width bottleneck
     """
 
-    def __init__(self, out_width, bottleneck=4):
+    def __init__(self, out_width, depth_multiplier=4):
         """
         Constructs a bottleneck block with the final number of output
         feature maps given by `out_width`. Bottlenecked layers will have
@@ -62,14 +62,15 @@ class Bottleneck(layers.Layer):
         Arguments:
             out_width: Positive integer, number of output feature maps.
 
-            bottleneck: Positive integer, factor by which to bottleneck
+            depth_multiplier: Positive integer, factor by which to bottleneck
                         relative to `out_width`. Default 4.
         """
         super().__init__()
 
-        # 1x1 depthwise conv, enter bottleneck
-        self.conv1 = layers.Conv2D(
-                filters=out_width // bottleneck,
+        # 3x3 separable conv
+        self.conv1 = layers.DepthwiseConv2D(
+                filters=out_width
+                depth_multiplier=depth_multiplier,
                 name='Bottleneck_enter',
                 kernel_size=1,
                 strides=1,
@@ -132,7 +133,7 @@ class Downsample(layers.Layer):
         3. 1x1/1 depthwise convolution + BN + ReLU
     """
 
-    def __init__(self, out_width, bottleneck=4, stride=2):
+    def __init__(self, out_width, depth_multiplier=4, stride=2):
         """
         Constructs a downsample block with the final number of output
         feature maps given by `out_width`. Stride of the spatial convolution
@@ -144,7 +145,7 @@ class Downsample(layers.Layer):
         Arguments:
             out_width:  Positive integer, number of output feature maps.
 
-            bottleneck: Positive integer, factor by which to bottleneck
+            depth_multiplier: Positive integer, factor by which to bottleneck
                         relative to `out_width`. Default 4.
 
             stride:     Positive integer or tuple of positive integers giving
@@ -157,8 +158,8 @@ class Downsample(layers.Layer):
         super().__init__()
 
         # 1x1 convolution, enter bottleneck (residual)
-        self.channel_conv_1 = layers.Conv2D(
-                filters=out_width // bottleneck,
+        self.channel_conv_1 = layers.DepthwiseConv2D(
+                depth_multiplier=1.0 / depth_multiplier,
                 name='Downsample_enter',
                 kernel_size=1,
                 strides=1,
