@@ -15,7 +15,7 @@ class Tail(layers.Layer):
         """
         super().__init__()
 
-        # Construct 7x7/2 convolution layer
+        # 7x7/1 conv
         # No BN / ReLU, handled in later blocks
         self.conv = layers.Conv2D(
                 filters=out_width,
