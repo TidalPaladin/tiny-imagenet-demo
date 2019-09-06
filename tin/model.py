@@ -11,14 +11,19 @@ class Tail(layers.Layer):
     def __init__(self, out_width=32):
         """
         Arguments:
-            out_width: Number of output feature maps. Default 32.
+            out_width:  Number of output feature maps. Default 32.
+            depth_multiplier:   multiply channels_in by depth_multiplier at the
+                                depthwise stage. Default 3.
         """
         super().__init__()
 
-        # 7x7/1 conv
+        # 7x7/1 separable conv
+        # Step 1 - depthwise conv; increase depth by depth_multiplier
+        # Step 2 - pointwise conv; further increase depth to out_width
         # No BN / ReLU, handled in later blocks
-        self.conv = layers.Conv2D(
+        self.conv = layers.SeparableConv2D(
                 filters=out_width,
+                depth_multiplier=depth_multiplier,
                 name='Tail_conv',
                 kernel_size=7,
                 strides=1,
@@ -67,10 +72,9 @@ class Bottleneck(layers.Layer):
         """
         super().__init__()
 
-        # 3x3 separable conv
-        self.conv1 = layers.DepthwiseConv2D(
-                filters=out_width
-                depth_multiplier=depth_multiplier,
+        # Pointwise conv, enter bottleneck
+        self.conv1 = layers.SeparableConv2D(
+                filters=out_width // depth_multiplier,
                 name='Bottleneck_enter',
                 kernel_size=1,
                 strides=1,
@@ -80,7 +84,12 @@ class Bottleneck(layers.Layer):
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
 
-        # 3x3 depthwise separable conv, exit bottleneck
+        # 3x3 separable conv
+        # Step 1 - depthwise conv; spatial mixing in bottleneck
+        # Step 2 - pointwise conv; exit bottleneck
+        #
+        # Note: Can specify `depth_multiplier` arg to exit bottleneck
+        #       at the depthwise step (rather than pointwise)
         self.conv2 = layers.SeparableConv2D(
                 filters=out_width,
                 name='Bottleneck_exit',
@@ -90,7 +99,6 @@ class Bottleneck(layers.Layer):
                 activation=None,
                 padding='same'
         )
-
         self.bn2 = layers.BatchNormalization()
         self.relu2 = layers.ReLU()
 
@@ -157,9 +165,9 @@ class Downsample(layers.Layer):
         """
         super().__init__()
 
-        # 1x1 convolution, enter bottleneck (residual)
-        self.channel_conv_1 = layers.DepthwiseConv2D(
-                depth_multiplier=1.0 / depth_multiplier,
+        # Pointwise conv, enter bottleneck (residual)
+        self.channel_conv_1 = layers.SeparableConv2D(
+                filters=out_width // depth_multiplier,
                 name='Downsample_enter',
                 kernel_size=1,
                 strides=1,
@@ -169,7 +177,9 @@ class Downsample(layers.Layer):
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
 
-        # 3x3 depthwise separable conv, exit bottleneck (residual)
+        # 3x3 separable conv (residual)
+        # Step 1 - depthwise conv; spatial mixing in bottleneck
+        # Step 2 - pointwise conv; exit bottleneck
         self.spatial_conv = layers.SeparableConv2D(
                 filters=out_width,
                 name='Downsample_conv',
@@ -182,7 +192,9 @@ class Downsample(layers.Layer):
         self.bn2 = layers.BatchNormalization()
         self.relu2 = layers.ReLU()
 
-        # 3x3/2 conv (main)
+        # 3x3 separable conv (main)
+        # Step 1 - depthwise conv; spatial mixing in bottleneck
+        # Step 2 - pointwise conv; exit bottleneck
         self.main = layers.Conv2D(
                 filters=out_width,
                 name='Downsample_main',
