@@ -81,7 +81,7 @@ def train_model(model, train, validate, initial_epoch):
 
     metrics = [
         tf.keras.metrics.SparseCategoricalAccuracy(),
-        tf.keras.metrics.SparseTopKCategoricalAccuracy(k=2),
+        tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5),
     ]
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
