@@ -54,7 +54,7 @@ def preprocess():
             rescale=1./255,
             horizontal_flip=True,
             data_format='channels_last',
-            validation_split=0.01,
+            validation_split=FLAGS.validation_split,
     )
 
     # Create generator to yield a training set from directory
