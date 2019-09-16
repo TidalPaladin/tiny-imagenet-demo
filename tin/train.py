@@ -111,9 +111,10 @@ def train_model(model, train, validate, initial_epoch):
     """
 
     # Top 1 and top 5 categorical accuracy
+    k = 5
     metrics = [
-        tf.keras.metrics.SparseCategoricalAccuracy(),
-        tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5),
+        tf.keras.metrics.SparseCategoricalAccuracy(name='acc'),
+        tf.keras.metrics.SparseTopKCategoricalAccuracy(name='top_%i_acc' % k, k=k),
     ]
 
     # Use softmax + cross entropy loss
