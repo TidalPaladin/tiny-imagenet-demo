@@ -83,8 +83,6 @@ def preprocess():
 def construct_model():
     """Returns a TinyImageNet model. Place custom head/tail layer inclusions here"""
 
-    logging.debug("Running with num classes: %i", FLAGS.classes)
-
     # Here TinyImageNetHead is explicitly constructed for clarity and passed
     #   as the use_head arg to TinyImageNet. Can also use `use_head=True`.
     head = TinyImageNetHead(num_classes=FLAGS.classes,
@@ -93,12 +91,24 @@ def construct_model():
                             dropout=FLAGS.dropout,
                             name='head')
 
-    model = TinyImageNet(
-            levels=FLAGS.levels,
-            width=64,
-            use_head=head,
-            use_tail=True
-    )
+    if FLAGS.inception:
+        logging.info("Using Inception network with %i classes", FLAGS.classes)
+        model = TinyInceptionNet(
+                levels=FLAGS.levels,
+                width=32,
+                use_head=head,
+                use_tail=True
+        )
+
+    elif FLAGS.resnet:
+        logging.info("Using Resnet network with %i classes", FLAGS.classes)
+        model = TinyInceptionNet(
+                levels=FLAGS.levels,
+                width=32,
+                use_head=head,
+                use_tail=True
+        )
+
     return model
 
 def train_model(model, train, validate, initial_epoch):
