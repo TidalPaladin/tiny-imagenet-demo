@@ -73,7 +73,7 @@ flags.DEFINE_integer(
 
 flags.DEFINE_float(
     'validation_split',
-    0.05,
+    0.1,
     'Fraction of dataset to reserve for validation'
 )
 
