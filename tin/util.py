@@ -52,6 +52,25 @@ def get_callbacks(FLAGS):
     stopping_cb = tf.keras.callbacks.EarlyStopping(**stopping_args)
     callbacks.append(stopping_cb)
 
+    # Decay LR exponentially over epochs
+    def scheduler(epoch):
+        if epoch < FLAGS.lr_decay_freq:
+            result = FLAGS.lr
+        else:
+            result = FLAGS.lr * (FLAGS.lr_decay_coeff ** (epoch - FLAGS.lr_decay_freq))
+        logging.info("Scheduled LR: %0.4f", result)
+        return float(result)
+
+    if FLAGS.lr_decay_coeff:
+        lr_decay_args = {
+                'interval': FLAGS.lr_decay_freq,
+                'coeff': FLAGS.lr_decay_coeff,
+        }
+        logging.info("LRDecay: %s", lr_decay_args)
+        lr_decay_cb = tf.keras.callbacks.LearningRateScheduler(scheduler)
+        callbacks.append(lr_decay_cb)
+
+
     # Skip IO callbacks if requested, return callback list
     if FLAGS.dry: return callbacks
 
