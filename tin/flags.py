@@ -108,6 +108,12 @@ flags.DEFINE_float(
     'L2 norm for head'
 )
 
+flags.DEFINE_float(
+    'dropout',
+    None,
+    'Dropout ratio'
+)
+
 flags.DEFINE_integer(
     'seed',
     42,
@@ -220,6 +226,12 @@ flags.register_validator(
     'l2',
     lambda v: v == None or v > 0,
     message='--l2 must be a float > 0. Use l2=None for no regularization'
+)
+
+flags.register_validator(
+    'dropout',
+    lambda v: v == None or (float(v) > 0 and float(v) <= 1.0),
+    message='--dropout must be a float on [0, 1.0].'
 )
 
 flags.register_validator(
