@@ -6,6 +6,14 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import Model
 
+from absl import logging
+
+# Some default level args for Resnet
+LEVELS_RESNET_18 = [2, 2, 2, 2]
+LEVELS_RESNET_50 = [3, 4, 6, 3]
+LEVELS_RESNET_101 = [3, 4, 23, 3]
+LEVELS_RESNET_152 = [3, 8, 36, 3]
+
 class Tail(layers.Layer):
     """ Basic tail consisting of a 7x7/1 separable convolution """
 
