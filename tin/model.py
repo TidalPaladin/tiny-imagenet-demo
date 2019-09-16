@@ -309,7 +309,11 @@ class TinyImageNetHead(layers.Layer):
 
         regularize = TinyImageNetHead.get_regularizers(l1, l2)
 
-        self.dropout = layers.Dropout(dropout) if dropout else None
+        if dropout:
+            logging.info("Using dropout=%f", dropout)
+            self.dropout = layers.Dropout(dropout)
+        else:
+            logging.info("Not using dropout")
 
         self.dense = layers.Dense(
                 units=num_classes,
