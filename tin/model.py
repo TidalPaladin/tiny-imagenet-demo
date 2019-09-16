@@ -263,6 +263,87 @@ class Downsample(layers.Layer):
         # Combine residual and main paths
         return self.merge([main, _])
 
+class InceptionDownsample(Downsample):
+    """
+    Resnet style residual downsampling block consisting of:
+        1. 1x1/1 pointwise bottleneck convolution (+BN + ReLU)
+        2. 3x3/2 separable conv to exit bottleneck (with downsampling)
+        3. 3x3/2 separable conv along main path (no bottlenecking)
+        4. 3x3/2 max pooling along main path (no bottlenecking)
+    """
+
+    def __init__(self, out_width, bottleneck=4, stride=2):
+        """
+        Constructs a downsample block with the final number of output
+        feature maps given by `out_width`. Stride of the spatial convolution
+        layer is given by `stride`. Take care to increase width appropriately
+        for a given spatial downsample.
+
+        The first two convolutions are bottlenecked according to `bottleneck`.
+
+        Arguments:
+            out_width:  Positive integer, number of output feature maps.
+
+            bottleneck:
+                        Positive integer, factor by which to bottleneck
+                        relative to `out_width`. Default 4.
+
+            stride:     Positive integer or tuple of positive integers giving
+                        the stride of the depthwise separable convolution layer.
+                        If a single value, row and col stride will be
+                        set to the given value. If a tuple, assign row and
+                        col stride from the tuple as (row, col).  Default 2.
+
+        """
+        super().__init__(out_width, bottleneck, stride)
+
+
+        # Pointwise conv, enter bottleneck (residual)
+        self.pool = layers.MaxPooling2D(
+                pool_size=3,
+                name='Downsample_pool',
+                strides=2,
+                padding='same'
+        )
+
+        self.concat = layers.Concatenate()
+
+    def call(self, inputs, training=False, **kwargs):
+        """
+        Runs the forward pass for this layer
+
+        Arguments:
+            input: input tensor(s)
+            training: boolean, whether or not
+
+        Keyword Arguments:
+            Forwarded to call() of each component layer.
+
+        Return:
+            Output of forward pass
+        """
+
+        # BN + ReLU prior to main / residual split
+        inputs = self.bn1(inputs, training=training)
+        inputs = self.relu1(inputs)
+
+        # Enter bottleneck
+        _ = self.channel_conv_1(inputs)
+
+        # Spatial convolution
+        _ = self.bn2(_, training=training)
+        _ = self.relu2(_)
+        _ = self.spatial_conv(_)
+
+        # Main path with convolution
+        main = self.main(inputs)
+
+        # Main path with pooling
+        pool = self.pool(inputs)
+
+        # Add residual and main paths, concat pooling path
+        return self.concat([pool,self.merge([main, _])])
+
 
 class TinyImageNetHead(layers.Layer):
     """
