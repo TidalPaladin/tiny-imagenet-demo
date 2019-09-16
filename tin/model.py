@@ -347,6 +347,60 @@ class TinyImageNetHead(layers.Layer):
         #   in order to exploit numerically stable result of combined op
         _ = self.softmax(_) if not training else _
         return _
+
+class TinyImageNetMultiStageHead(TinyImageNetHead):
+    """
+    Similar to TinyImageNetHead, but uses two FC layers. Probably only
+    useful where num_features >> num_classes
+    """
+
+    def __init__(self, num_classes, l1=0.0, l2=0.0, dropout=None, **kwargs):
+        """
+        Arguments:
+            num_classes: Positive integer, number of classes in the output of the
+                         fully connected layer.
+
+            l1: Positive float, l1 regularization lambda
+            l2: Positive float, l2 regularization lambda
+            dropout: Positive float, dropout ratio between GAP and FC layers
+
+        Keyword Arguments:
+            Forwarded to the dense layer.
+        """
+        super().__init__(num_classes, l1, l2, dropout, **kwargs)
+
+        regularize = TinyImageNetHead.get_regularizers(l1, l2)
+
+        self.dense_pre = layers.Dense(
+                units=num_classes*2,
+                use_bias=True,
+                activation='relu',
+                name='Head_dense',
+                kernel_regularizer=regularize,
+                bias_regularizer=regularize,
+        )
+
+        self.dropout2 = layers.Dropout(dropout) if dropout else None
+
+    def call(self, inputs, training=False, **kwargs):
+        """
+        Runs the forward pass for this layer
+
+        Arguments:
+            input: input tensor(s)
+            training: boolean, whether or not
+
+        Keyword Arguments:
+            Forwarded to call() of each component layer.
+
+        Return:
+            Output of forward pass
+        """
+        _ = self.global_avg(inputs)
+        _ = self.dropout(_, training=training) if self.dropout else _
+        _ = self.dense_pre(_)
+
+        _ = self.dropout2(_, training=training) if self.dropout2 else _
         _ = self.dense(_)
 
         # Apply softmax if not training, otherwise return unscaled logits
