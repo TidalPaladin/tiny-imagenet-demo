@@ -87,9 +87,18 @@ def construct_model():
 
     # Here TinyImageNetHead is explicitly constructed for clarity and passed
     #   as the use_head arg to TinyImageNet. Can also use `use_head=True`.
-    head = TinyImageNetHead(num_classes=FLAGS.classes, name='head')
+    head = TinyImageNetHead(num_classes=FLAGS.classes,
+                            l1=FLAGS.l1,
+                            l2=FLAGS.l2,
+                            dropout=FLAGS.dropout,
+                            name='head')
 
-    model = TinyImageNet(levels=FLAGS.levels, use_head=head, use_tail=True)
+    model = TinyImageNet(
+            levels=FLAGS.levels,
+            width=64,
+            use_head=head,
+            use_tail=True
+    )
     return model
 
 def train_model(model, train, validate, initial_epoch):
