@@ -48,7 +48,7 @@ def get_callbacks(FLAGS):
             'min_delta': 0.001,
             'patience': 5,
     }
-    logging.info("EarlyStopping: %s", learnrate_args)
+    logging.info("EarlyStopping: %s", stopping_args)
     stopping_cb = tf.keras.callbacks.EarlyStopping(**stopping_args)
     callbacks.append(stopping_cb)
 
