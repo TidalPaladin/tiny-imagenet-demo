@@ -94,6 +94,13 @@ flags.DEFINE_float(
     None,
     'L2 norm for head'
 )
+
+flags.DEFINE_integer(
+    'seed',
+    42,
+    'If set, the integer to seed all random generators with'
+)
+
 flags.DEFINE_string(
     'checkpoint_fmt',
     'tin_{epoch:03d}.hdf5',
@@ -190,6 +197,14 @@ flags.register_validator(
     lambda v: v == None or v > 0,
     message='--l2 must be a float > 0. Use l2=None for no regularization'
 )
+
+flags.register_validator(
+    'seed',
+    lambda v: v == None or int(v) == v,
+    message='--seed must be None or an integer'
+)
+
+flags.register_validator(
     'checkpoint_fmt',
     lambda v: len(v) > 0,
     message='--checkpoint_fmt must be a non-empty string'
