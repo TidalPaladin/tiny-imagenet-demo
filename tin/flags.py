@@ -83,6 +83,17 @@ flags.DEFINE_float(
     'Initial learning rate'
 )
 
+flags.DEFINE_float(
+    'l1',
+    None,
+    'L1 norm for head'
+)
+
+flags.DEFINE_float(
+    'l2',
+    None,
+    'L2 norm for head'
+)
 flags.DEFINE_string(
     'checkpoint_fmt',
     'tin_{epoch:03d}.hdf5',
@@ -168,6 +179,17 @@ flags.register_validator(
 )
 
 flags.register_validator(
+flags.register_validator(
+    'l1',
+    lambda v: v == None or v > 0,
+    message='--l1 must be a float > 0. Use l1=None for no regularization'
+)
+
+flags.register_validator(
+    'l2',
+    lambda v: v == None or v > 0,
+    message='--l2 must be a float > 0. Use l2=None for no regularization'
+)
     'checkpoint_fmt',
     lambda v: len(v) > 0,
     message='--checkpoint_fmt must be a non-empty string'
