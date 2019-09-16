@@ -35,7 +35,9 @@ def get_callbacks(FLAGS):
     learnrate_args = {
             'monitor':'loss',
             'factor': 0.5,
-            'patience': 3,
+            'patience': 5,
+            'min_delta': 0.01,
+            'cooldown': 2,
             'min_lr': 0.0001
     }
     logging.info("ReduceLROnPlateau: %s", learnrate_args)
@@ -45,7 +47,7 @@ def get_callbacks(FLAGS):
     # Stop early if loss isn't improving
     stopping_args = {
             'monitor':'loss',
-            'min_delta': 0.001,
+            'min_delta': 0.01,
             'patience': 5,
     }
     logging.info("EarlyStopping: %s", stopping_args)
