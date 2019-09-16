@@ -27,16 +27,18 @@ class Tail(layers.Layer):
                         depthwise stage. Default 3.
         """
         super().__init__()
+        logging.debug("Created tail, width=%i, multiplier=%i", out_width, depth_multiplier)
 
         # 7x7/1 separable conv
         # Step 1 - depthwise conv; increase depth by depth_multiplier
         # Step 2 - pointwise conv; further increase depth to out_width
         # No BN / ReLU, handled in later blocks
+        # NOTE SeparableConv2D may not respect depth multipier (bug)
         self.conv = layers.SeparableConv2D(
                 filters=out_width,
-                depth_multiplier=depth_multiplier,
+                #depth_multiplier=depth_multiplier,
                 name='Tail_conv',
-                kernel_size=7,
+                kernel_size=3,
                 strides=1,
                 padding='same',
                 use_bias=False,
