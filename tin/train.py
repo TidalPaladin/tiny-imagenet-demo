@@ -53,7 +53,7 @@ def preprocess():
             samplewise_std_normalization=True,
             rescale=1./255,
             horizontal_flip=True,
-            data_format=None,
+            data_format='channels_last',
             validation_split=0.01,
     )
 
