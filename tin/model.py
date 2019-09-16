@@ -70,29 +70,33 @@ class Bottleneck(layers.Layer):
         2. 3x3/1 separable conv to exit bottleneck (+BN + ReLU)
     """
 
-    def __init__(self, out_width, depth_multiplier=4):
+    def __init__(self, out_width, bottleneck=4):
         """
         Constructs a bottleneck block with the final number of output
         feature maps given by `out_width`. Bottlenecked layers will have
-        output feature map count given by `out_width // depth_multiplier`.
+        output feature map count given by `out_width // bottleneck`.
 
         Arguments:
             out_width:  Positive integer, number of output feature maps.
 
-            depth_multiplier:
+            bottleneck:
                         Positive integer, factor by which to bottleneck
                         relative to `out_width`. Default 4.
         """
         super().__init__()
 
+        # Width must be integer multiple of bottlneck factor
+        assert(out_width / bottleneck == out_width // bottleneck)
+
         # Pointwise conv, enter bottleneck
-        self.conv1 = layers.SeparableConv2D(
-                filters=out_width // depth_multiplier,
+        self.conv1 = layers.Conv2D(
+                filters=out_width // bottleneck,
                 name='Bottleneck_enter',
                 kernel_size=1,
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
@@ -101,7 +105,7 @@ class Bottleneck(layers.Layer):
         # Step 1 - depthwise conv; spatial mixing in bottleneck
         # Step 2 - pointwise conv; exit bottleneck
         #
-        # Note: Can specify `depth_multiplier` arg to exit bottleneck
+        # Note: Can specify `bottleneck` arg to exit bottleneck
         #       at the depthwise step (rather than pointwise)
         self.conv2 = layers.SeparableConv2D(
                 filters=out_width,
@@ -154,7 +158,7 @@ class Downsample(layers.Layer):
         3. 3x3/2 separable conv along main path (no bottlenecking)
     """
 
-    def __init__(self, out_width, depth_multiplier=4, stride=2):
+    def __init__(self, out_width, bottleneck=4, stride=2):
         """
         Constructs a downsample block with the final number of output
         feature maps given by `out_width`. Stride of the spatial convolution
@@ -166,7 +170,7 @@ class Downsample(layers.Layer):
         Arguments:
             out_width:  Positive integer, number of output feature maps.
 
-            depth_multiplier:
+            bottleneck:
                         Positive integer, factor by which to bottleneck
                         relative to `out_width`. Default 4.
 
@@ -179,14 +183,18 @@ class Downsample(layers.Layer):
         """
         super().__init__()
 
+        # Width must be integer multiple of bottlneck factor
+        assert(out_width / bottleneck == out_width // bottleneck)
+
         # Pointwise conv, enter bottleneck (residual)
-        self.channel_conv_1 = layers.SeparableConv2D(
-                filters=out_width // depth_multiplier,
+        self.channel_conv_1 = layers.Conv2D(
+                filters=out_width // bottleneck,
                 name='Downsample_enter',
                 kernel_size=1,
                 strides=1,
                 use_bias=False,
                 activation=None,
+                padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu1 = layers.ReLU()
@@ -209,7 +217,7 @@ class Downsample(layers.Layer):
         # 3x3 separable conv (main)
         # Step 1 - depthwise conv; spatial mixing in bottleneck
         # Step 2 - pointwise conv; exit bottleneck
-        self.main = layers.Conv2D(
+        self.main = layers.SeparableConv2D(
                 filters=out_width,
                 name='Downsample_main',
                 kernel_size=3,
