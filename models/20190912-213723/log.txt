@@ -1,0 +1,148 @@
+docker-compose run tiny-imagenet --lr=0.005 --levels=3,6,4 --classes 200
+** Starting Tensorboard. Logdir=/artifacts/tblogs **
+** Starting default training pipeline with user flags **
+TensorBoard 1.15.0a20190806 at http://aba0d848c4ac:6006/ (Press CTRL+C to quit)
+2019-09-12 21:37:23.976145: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2019-09-12 21:37:23.989110: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties:
+name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.253
+pciBusID: 0000:03:00.0
+2019-09-12 21:37:23.989282: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-09-12 21:37:23.992569: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-09-12 21:37:23.998864: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2019-09-12 21:37:23.999952: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2019-09-12 21:37:24.002777: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2019-09-12 21:37:24.005724: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2019-09-12 21:37:24.016315: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-09-12 21:37:24.017702: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0
+2019-09-12 21:37:24.018498: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2019-09-12 21:37:24.030646: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3820235000 Hz
+2019-09-12 21:37:24.031607: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x4fd0c20 executing computations on platform Host. Devices:
+2019-09-12 21:37:24.031628: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): Host, Default Version
+2019-09-12 21:37:24.092478: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x500b690 executing computations on platform CUDA. Devices:
+2019-09-12 21:37:24.092500: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): GeForce GTX 970, Compute Capability 5.2
+2019-09-12 21:37:24.092962: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties:
+name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.253
+pciBusID: 0000:03:00.0
+2019-09-12 21:37:24.092997: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-09-12 21:37:24.093012: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-09-12 21:37:24.093023: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2019-09-12 21:37:24.093034: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2019-09-12 21:37:24.093045: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2019-09-12 21:37:24.093060: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2019-09-12 21:37:24.093073: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-09-12 21:37:24.093985: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0
+2019-09-12 21:37:24.094454: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-09-12 21:37:24.095543: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1159] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-09-12 21:37:24.095557: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1165]      0
+2019-09-12 21:37:24.095563: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1178] 0:   N
+2019-09-12 21:37:24.096742: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1304] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 3673 MB memory) -> physical GPU (device: 0, name: GeForce GTX 970, pci bus id: 0000:03:00.0, compute capability: 5.2)
+I0912 21:37:26.695893 140190114543424 util.py:28] Model checkpoint dir: /artifacts/checkpoint/20190912-213723
+I0912 21:37:26.696022 140190114543424 util.py:30] Tensorboard log dir: /artifacts/tblogs
+I0912 21:37:26.696087 140190114543424 util.py:41] ReduceLROnPlateau: {'monitor': 'loss', 'factor': 0.2, 'patience': 5, 'min_delta': 0.01, 'min_lr': 0.0001}
+I0912 21:37:26.696177 140190114543424 util.py:50] EarlyStopping: {'monitor': 'loss', 'factor': 0.2, 'patience': 5, 'min_delta': 0.01, 'min_lr': 0.0001}
+I0912 21:37:26.699577 140190114543424 train.py:42] Reading images from: /data/src
+Found 90000 images belonging to 200 classes.
+Found 10000 images belonging to 200 classes.
+I0912 21:37:31.003022 140190114543424 train.py:136] Fitting model with args:
+{
+  "generator": "<keras_preprocessing.image.directory_iterator.DirectoryIterator object at 0x7f801dbefa90>",
+  "epochs": "100",
+  "validation_data": "<keras_preprocessing.image.directory_iterator.DirectoryIterator object at 0x7f7f807d0978>",
+  "callbacks": "[<tensorflow.python.keras.callbacks.ModelCheckpoint object at 0x7f801dbef518>, <tensorflow.python.keras.callbacks.TensorBoard object at 0x7f801dbef3c8>, <tensorflow.python.keras.callbacks.ReduceLROnPlateau object at 0x7f801dbef2e8>, <tensorflow.python.keras.callbacks.EarlyStopping object at 0x7f801dbef390>]",
+  "initial_epoch": "0"
+}
+Epoch 1/100
+2019-09-12 21:37:31.451618: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-09-12 21:37:31.744240: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-09-12 21:37:33.324627: I tensorflow/core/profiler/lib/profiler_session.cc:184] Profiler session started.
+2019-09-12 21:37:33.328932: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcupti.so.10.0
+   1/2813 [..............................] - ETA: 1:49:50 - loss: 5.3189 - acc: 0.0000e+00 - top_5_acc: 0.03122019-09-12 21:37:33.741161: I tensorflow/core/platform/default/device_tracer.cc:588] Collecting 1321 kernel records, 312 memcpy records.
+2813/2813 [==============================] - 688s 245ms/step - loss: 4.8559 - acc: 0.0403 - top_5_acc: 0.1353 - val_loss: 5.2767 - val_acc: 0.0646 - val_top_5_acc: 0.2058
+Epoch 2/100
+   2/2813 [..............................] - ETA: 11:24 - loss: 4.1397 - acc: 0.1094 - top_5_acc: 0.2500E0912 21:49:00.237611 140319277405952 directory_watcher.py:242] File /artifacts/tblogs/20190912-213723/train/events.out.tfevents.1568324251.aba0d848c4ac.1.4624.v2 updated even though the current file is /artifacts/tblogs/20190912-213723/train/events.out.tfevents.1568324253.aba0d848c4ac.profile-empty
+2813/2813 [==============================] - 678s 241ms/step - loss: 3.9769 - acc: 0.1445 - top_5_acc: 0.3545 - val_loss: 5.2270 - val_acc: 0.1641 - val_top_5_acc: 0.3987
+Epoch 3/100
+2813/2813 [==============================] - 678s 241ms/step - loss: 3.5063 - acc: 0.2195 - top_5_acc: 0.4677 - val_loss: 5.1938 - val_acc: 0.2240 - val_top_5_acc: 0.4721
+Epoch 4/100
+2813/2813 [==============================] - 664s 236ms/step - loss: 3.2237 - acc: 0.2695 - top_5_acc: 0.5308 - val_loss: 5.1647 - val_acc: 0.2518 - val_top_5_acc: 0.5056
+Epoch 5/100
+2813/2813 [==============================] - 666s 237ms/step - loss: 3.0387 - acc: 0.3040 - top_5_acc: 0.5733 - val_loss: 5.1399 - val_acc: 0.2706 - val_top_5_acc: 0.5276
+Epoch 6/100
+2813/2813 [==============================] - 661s 235ms/step - loss: 2.8974 - acc: 0.3312 - top_5_acc: 0.6000 - val_loss: 5.1145 - val_acc: 0.2980 - val_top_5_acc: 0.5675
+Epoch 7/100
+2813/2813 [==============================] - 658s 234ms/step - loss: 2.7898 - acc: 0.3492 - top_5_acc: 0.6222 - val_loss: 5.1016 - val_acc: 0.3198 - val_top_5_acc: 0.5858
+Epoch 8/100
+2813/2813 [==============================] - 665s 236ms/step - loss: 2.7029 - acc: 0.3686 - top_5_acc: 0.6390 - val_loss: 5.0720 - val_acc: 0.3442 - val_top_5_acc: 0.6184
+Epoch 9/100
+2813/2813 [==============================] - 665s 237ms/step - loss: 2.6289 - acc: 0.3802 - top_5_acc: 0.6540 - val_loss: 5.0667 - val_acc: 0.3569 - val_top_5_acc: 0.6234
+Epoch 10/100
+2813/2813 [==============================] - 667s 237ms/step - loss: 2.5654 - acc: 0.3935 - top_5_acc: 0.6656 - val_loss: 5.0483 - val_acc: 0.3598 - val_top_5_acc: 0.6385
+Epoch 11/100
+2813/2813 [==============================] - 666s 237ms/step - loss: 2.5137 - acc: 0.4047 - top_5_acc: 0.6763 - val_loss: 5.0710 - val_acc: 0.3615 - val_top_5_acc: 0.6342
+Epoch 12/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 2.4608 - acc: 0.4145 - top_5_acc: 0.6866 - val_loss: 5.0728 - val_acc: 0.3445 - val_top_5_acc: 0.6134
+Epoch 13/100
+2813/2813 [==============================] - 671s 239ms/step - loss: 2.4239 - acc: 0.4224 - top_5_acc: 0.6924 - val_loss: 5.0421 - val_acc: 0.3801 - val_top_5_acc: 0.6523
+Epoch 14/100
+2813/2813 [==============================] - 672s 239ms/step - loss: 2.3864 - acc: 0.4287 - top_5_acc: 0.7002 - val_loss: 5.0340 - val_acc: 0.3892 - val_top_5_acc: 0.6553
+Epoch 15/100
+2813/2813 [==============================] - 672s 239ms/step - loss: 2.3465 - acc: 0.4375 - top_5_acc: 0.7084 - val_loss: 5.0295 - val_acc: 0.3905 - val_top_5_acc: 0.6674
+Epoch 16/100
+2813/2813 [==============================] - 673s 239ms/step - loss: 2.3208 - acc: 0.4439 - top_5_acc: 0.7116 - val_loss: 5.0300 - val_acc: 0.3878 - val_top_5_acc: 0.6605
+Epoch 17/100
+2813/2813 [==============================] - 673s 239ms/step - loss: 2.2875 - acc: 0.4500 - top_5_acc: 0.7171 - val_loss: 5.0197 - val_acc: 0.3898 - val_top_5_acc: 0.6639
+Epoch 18/100
+2813/2813 [==============================] - 663s 236ms/step - loss: 2.2553 - acc: 0.4569 - top_5_acc: 0.7248 - val_loss: 5.0143 - val_acc: 0.3990 - val_top_5_acc: 0.6617
+Epoch 19/100
+2813/2813 [==============================] - 662s 235ms/step - loss: 2.2360 - acc: 0.4604 - top_5_acc: 0.7271 - val_loss: 5.0150 - val_acc: 0.4092 - val_top_5_acc: 0.6742
+Epoch 20/100
+2813/2813 [==============================] - 662s 236ms/step - loss: 2.2151 - acc: 0.4645 - top_5_acc: 0.7321 - val_loss: 5.0203 - val_acc: 0.3981 - val_top_5_acc: 0.6677
+Epoch 21/100
+2813/2813 [==============================] - 658s 234ms/step - loss: 2.1868 - acc: 0.4686 - top_5_acc: 0.7351 - val_loss: 5.0198 - val_acc: 0.4117 - val_top_5_acc: 0.6770
+Epoch 22/100
+2813/2813 [==============================] - 657s 233ms/step - loss: 2.1706 - acc: 0.4748 - top_5_acc: 0.7389 - val_loss: 5.0321 - val_acc: 0.3962 - val_top_5_acc: 0.6635
+Epoch 23/100
+2813/2813 [==============================] - 656s 233ms/step - loss: 2.1533 - acc: 0.4753 - top_5_acc: 0.7414 - val_loss: 4.9886 - val_acc: 0.4126 - val_top_5_acc: 0.6776
+Epoch 24/100
+2813/2813 [==============================] - 656s 233ms/step - loss: 2.1340 - acc: 0.4806 - top_5_acc: 0.7443 - val_loss: 4.9926 - val_acc: 0.4237 - val_top_5_acc: 0.6876
+Epoch 25/100
+2813/2813 [==============================] - 668s 238ms/step - loss: 2.1194 - acc: 0.4850 - top_5_acc: 0.7474 - val_loss: 4.9977 - val_acc: 0.4182 - val_top_5_acc: 0.6819
+Epoch 26/100
+2813/2813 [==============================] - 667s 237ms/step - loss: 2.0969 - acc: 0.4868 - top_5_acc: 0.7505 - val_loss: 4.9928 - val_acc: 0.4178 - val_top_5_acc: 0.6869
+Epoch 27/100
+2813/2813 [==============================] - 667s 237ms/step - loss: 2.0832 - acc: 0.4918 - top_5_acc: 0.7536 - val_loss: 4.9841 - val_acc: 0.4238 - val_top_5_acc: 0.6864
+Epoch 28/100
+2813/2813 [==============================] - 668s 238ms/step - loss: 2.0708 - acc: 0.4937 - top_5_acc: 0.7551 - val_loss: 4.9923 - val_acc: 0.4165 - val_top_5_acc: 0.6842
+Epoch 29/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 2.0561 - acc: 0.4961 - top_5_acc: 0.7568 - val_loss: 4.9850 - val_acc: 0.4288 - val_top_5_acc: 0.6950
+Epoch 30/100
+2813/2813 [==============================] - 668s 238ms/step - loss: 2.0443 - acc: 0.4989 - top_5_acc: 0.7610 - val_loss: 4.9764 - val_acc: 0.4337 - val_top_5_acc: 0.6974
+Epoch 31/100
+2813/2813 [==============================] - 668s 238ms/step - loss: 2.0319 - acc: 0.5006 - top_5_acc: 0.7622 - val_loss: 4.9892 - val_acc: 0.4295 - val_top_5_acc: 0.6938
+Epoch 32/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 2.0219 - acc: 0.5028 - top_5_acc: 0.7643 - val_loss: 4.9821 - val_acc: 0.4260 - val_top_5_acc: 0.6895
+Epoch 33/100
+2813/2813 [==============================] - 667s 237ms/step - loss: 2.0054 - acc: 0.5053 - top_5_acc: 0.7661 - val_loss: 4.9670 - val_acc: 0.4339 - val_top_5_acc: 0.6982
+Epoch 34/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9943 - acc: 0.5085 - top_5_acc: 0.7686 - val_loss: 4.9643 - val_acc: 0.4394 - val_top_5_acc: 0.6960
+Epoch 35/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9860 - acc: 0.5098 - top_5_acc: 0.7696 - val_loss: 4.9728 - val_acc: 0.4370 - val_top_5_acc: 0.6950
+Epoch 36/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9727 - acc: 0.5144 - top_5_acc: 0.7718 - val_loss: 4.9696 - val_acc: 0.4445 - val_top_5_acc: 0.7031
+Epoch 37/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9642 - acc: 0.5159 - top_5_acc: 0.7736 - val_loss: 4.9514 - val_acc: 0.4451 - val_top_5_acc: 0.7069
+Epoch 38/100
+2813/2813 [==============================] - 667s 237ms/step - loss: 1.9564 - acc: 0.5165 - top_5_acc: 0.7748 - val_loss: 4.9804 - val_acc: 0.4307 - val_top_5_acc: 0.6979
+Epoch 39/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9435 - acc: 0.5207 - top_5_acc: 0.7774 - val_loss: 4.9687 - val_acc: 0.4244 - val_top_5_acc: 0.6956
+Epoch 40/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9364 - acc: 0.5196 - top_5_acc: 0.7781 - val_loss: 4.9612 - val_acc: 0.4404 - val_top_5_acc: 0.7047
+Epoch 41/100
+2813/2813 [==============================] - 667s 237ms/step - loss: 1.9244 - acc: 0.5232 - top_5_acc: 0.7802 - val_loss: 4.9780 - val_acc: 0.4337 - val_top_5_acc: 0.6965
+Epoch 42/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9201 - acc: 0.5226 - top_5_acc: 0.7826 - val_loss: 4.9671 - val_acc: 0.4401 - val_top_5_acc: 0.7040
+Epoch 43/100
+2813/2813 [==============================] - 669s 238ms/step - loss: 1.9062 - acc: 0.5281 - top_5_acc: 0.7836 - val_loss: 4.9595 - val_acc: 0.4457 - val_top_5_acc: 0.7068
+Epoch 44/100
+2813/2813 [==============================] - 668s 237ms/step - loss: 1.9114 - acc: 0.5259 - top_5_acc: 0.7809 - val_loss: 4.9648 - val_acc: 0.4426 - val_top_5_acc: 0.7010
+
