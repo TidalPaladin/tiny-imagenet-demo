@@ -271,24 +271,54 @@ class TinyImageNetHead(layers.Layer):
         2. Fully connected layer + bias (no activation)
     """
 
-    def __init__(self, num_classes, **kwargs):
+    @staticmethod
+    def get_regularizers(l1, l2):
+
+        # TODO this should all fall under L1L2, but this was giving nan loss
+        if l1 and l2:
+            regularize = tf.keras.regularizers.L1L2(l1, l2)
+            logging.debug("FC l1 regularization=%f", l1)
+        elif l1 and not l2:
+            regularize = tf.keras.regularizers.l1(l1)
+            logging.debug("FC l2 regularization=%f", l1)
+        elif l2 and not l1:
+            regularize = tf.keras.regularizers.l2(l2)
+            logging.debug("FC regularization l1=%f l2=%f", l1, l2)
+        else:
+            regularize = None
+            logging.debug("FC no regularization")
+
+        return regularize
+
+    def __init__(self, num_classes, l1=0.0, l2=0.0, dropout=None, **kwargs):
         """
         Arguments:
             num_classes: Positive integer, number of classes in the output of the
                          fully connected layer.
 
+            l1: Positive float, l1 regularization lambda
+            l2: Positive float, l2 regularization lambda
+            dropout: Positive float, dropout ratio between GAP and FC layers
+
         Keyword Arguments:
             Forwarded to the dense layer.
         """
         super(TinyImageNetHead, self).__init__(**kwargs)
+        logging.debug("Building head with %i output classes", num_classes)
 
         self.global_avg = layers.GlobalAveragePooling2D()
+
+        regularize = TinyImageNetHead.get_regularizers(l1, l2)
+
+        self.dropout = layers.Dropout(dropout) if dropout else None
 
         self.dense = layers.Dense(
                 units=num_classes,
                 use_bias=True,
                 activation=None,
                 name='Head_dense',
+                kernel_regularizer=regularize,
+                bias_regularizer=regularize,
         )
 
         self.softmax = layers.Softmax()
@@ -309,6 +339,14 @@ class TinyImageNetHead(layers.Layer):
             Output of forward pass
         """
         _ = self.global_avg(inputs)
+        _ = self.dropout(_, training=training) if self.dropout else _
+        _ = self.dense(_)
+
+        # Apply softmax if not training, otherwise return unscaled logits
+        # In training, use softmax + cross entropy with `from_logits=True`
+        #   in order to exploit numerically stable result of combined op
+        _ = self.softmax(_) if not training else _
+        return _
         _ = self.dense(_)
 
         # Apply softmax if not training, otherwise return unscaled logits
