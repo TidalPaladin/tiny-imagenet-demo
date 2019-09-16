@@ -122,10 +122,7 @@ def train_model(model, train, validate, initial_epoch):
     #   softmax internally for a more stable backward pass
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
-    optimizer = tf.keras.optimizers.Adam(
-            learning_rate=FLAGS.lr,
-            epsilon=0.1
-    )
+    optimizer = tf.keras.optimizers.Adam(learning_rate=FLAGS.lr)
 
     # Compile model with given parameters prior to training
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)
