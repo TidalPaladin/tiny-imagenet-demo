@@ -20,6 +20,18 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_bool(
+    'resnet',
+    True,
+    'If true, use a Resnet style network'
+)
+
+flags.DEFINE_bool(
+    'inception',
+    False,
+    'If true, use an Inception style network'
+)
+
+flags.DEFINE_bool(
     'dry',
     False,
     ('If true, dont write Tensorboard logs or checkpoint files. '
