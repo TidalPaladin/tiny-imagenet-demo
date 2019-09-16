@@ -521,6 +521,8 @@ class TinyImageNet(tf.keras.Model):
         """
         super().__init__()
 
+        logging.info("Building TinyImagnet model: levels=%s, width=%i", levels, width)
+
         # Use default / custom / no tail based on `use_tail`
         if use_tail == True:
             self.tail = Tail(out_width=width)
