@@ -63,7 +63,8 @@ def preprocess():
             subset='training',
             target_size=(64, 64),
             class_mode='sparse',
-            batch_size=FLAGS.batch_size
+            batch_size=FLAGS.batch_size,
+            seed=FLAGS.seed
     )
 
     # Create generator to yield a validation set from directory
@@ -72,7 +73,8 @@ def preprocess():
             subset='validation',
             target_size=(64, 64),
             class_mode='sparse',
-            batch_size=FLAGS.batch_size
+            batch_size=FLAGS.batch_size,
+            seed=FLAGS.seed
     )
 
     return train_generator, val_generator
