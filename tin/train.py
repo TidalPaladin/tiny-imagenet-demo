@@ -51,11 +51,7 @@ def preprocess():
     datagen = ImageDataGenerator(
             samplewise_center=True,
             samplewise_std_normalization=True,
-            rotation_range=10,
             rescale=1./255,
-            width_shift_range=10,
-            height_shift_range=10,
-            brightness_range=None,
             horizontal_flip=True,
             data_format=None,
             validation_split=0.01,
