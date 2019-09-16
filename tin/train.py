@@ -51,14 +51,10 @@ def preprocess():
     datagen = ImageDataGenerator(
             samplewise_center=True,
             samplewise_std_normalization=True,
-            rotation_range=10,
             rescale=1./255,
-            width_shift_range=10,
-            height_shift_range=10,
-            brightness_range=None,
             horizontal_flip=True,
-            data_format=None,
-            validation_split=0.01,
+            data_format='channels_last',
+            validation_split=FLAGS.validation_split,
     )
 
     # Create generator to yield a training set from directory
@@ -67,7 +63,8 @@ def preprocess():
             subset='training',
             target_size=(64, 64),
             class_mode='sparse',
-            batch_size=FLAGS.batch_size
+            batch_size=FLAGS.batch_size,
+            seed=FLAGS.seed
     )
 
     # Create generator to yield a validation set from directory
@@ -76,7 +73,8 @@ def preprocess():
             subset='validation',
             target_size=(64, 64),
             class_mode='sparse',
-            batch_size=FLAGS.batch_size
+            batch_size=FLAGS.batch_size,
+            seed=FLAGS.seed
     )
 
     return train_generator, val_generator
@@ -89,9 +87,18 @@ def construct_model():
 
     # Here TinyImageNetHead is explicitly constructed for clarity and passed
     #   as the use_head arg to TinyImageNet. Can also use `use_head=True`.
-    head = TinyImageNetHead(num_classes=FLAGS.classes, name='head')
+    head = TinyImageNetHead(num_classes=FLAGS.classes,
+                            l1=FLAGS.l1,
+                            l2=FLAGS.l2,
+                            dropout=FLAGS.dropout,
+                            name='head')
 
-    model = TinyImageNet(levels=FLAGS.levels, use_head=head, use_tail=True)
+    model = TinyImageNet(
+            levels=FLAGS.levels,
+            width=64,
+            use_head=head,
+            use_tail=True
+    )
     return model
 
 def train_model(model, train, validate, initial_epoch):
@@ -104,9 +111,10 @@ def train_model(model, train, validate, initial_epoch):
     """
 
     # Top 1 and top 5 categorical accuracy
+    k = 5
     metrics = [
-        tf.keras.metrics.SparseCategoricalAccuracy(),
-        tf.keras.metrics.SparseTopKCategoricalAccuracy(k=5),
+        tf.keras.metrics.SparseCategoricalAccuracy(name='acc'),
+        tf.keras.metrics.SparseTopKCategoricalAccuracy(name='top_%i_acc' % k, k=k),
     ]
 
     # Use softmax + cross entropy loss
@@ -114,10 +122,7 @@ def train_model(model, train, validate, initial_epoch):
     #   softmax internally for a more stable backward pass
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
-    optimizer = tf.keras.optimizers.Adam(
-            learning_rate=FLAGS.lr,
-            epsilon=0.1
-    )
+    optimizer = tf.keras.optimizers.Adam(learning_rate=FLAGS.lr)
 
     # Compile model with given parameters prior to training
     model.compile(optimizer=optimizer, loss=loss, metrics=metrics)

@@ -22,6 +22,7 @@ DATE = datetime.now().strftime("%Y%m%d-%H%M%S")
 
 def get_callbacks(FLAGS):
     """ Gets model callbacks based on CLI flags """
+    callbacks = list()
 
     # Join checkpoint / Tensorboard log directories
     checkpoint_dir = os.path.join(FLAGS.artifacts_dir, 'checkpoint', DATE)
@@ -34,24 +35,46 @@ def get_callbacks(FLAGS):
     learnrate_args = {
             'monitor':'loss',
             'factor': 0.5,
-            'patience': 3,
+            'patience': 5,
+            'min_delta': 0.01,
+            'cooldown': 2,
             'min_lr': 0.0001
     }
     logging.info("ReduceLROnPlateau: %s", learnrate_args)
     learnrate_cb = tf.keras.callbacks.ReduceLROnPlateau(**learnrate_args)
+    callbacks.append(learnrate_cb)
 
     # Stop early if loss isn't improving
     stopping_args = {
             'monitor':'loss',
-            'min_delta': 0.001,
+            'min_delta': 0.01,
             'patience': 5,
     }
-    logging.info("EarlyStopping: %s", learnrate_args)
+    logging.info("EarlyStopping: %s", stopping_args)
     stopping_cb = tf.keras.callbacks.EarlyStopping(**stopping_args)
+    callbacks.append(stopping_cb)
+
+    # Decay LR exponentially over epochs
+    def scheduler(epoch):
+        if epoch < FLAGS.lr_decay_freq:
+            result = FLAGS.lr
+        else:
+            result = FLAGS.lr * (FLAGS.lr_decay_coeff ** (epoch - FLAGS.lr_decay_freq))
+        logging.info("Scheduled LR: %0.4f", result)
+        return float(result)
+
+    if FLAGS.lr_decay_coeff:
+        lr_decay_args = {
+                'interval': FLAGS.lr_decay_freq,
+                'coeff': FLAGS.lr_decay_coeff,
+        }
+        logging.info("LRDecay: %s", lr_decay_args)
+        lr_decay_cb = tf.keras.callbacks.LearningRateScheduler(scheduler)
+        callbacks.append(lr_decay_cb)
+
 
     # Skip IO callbacks if requested, return callback list
-    if FLAGS.dry:
-        return [learnrate_cb, stopping_cb ]
+    if FLAGS.dry: return callbacks
 
     # Make TB / checkpoint dirs
     # (after FLAGS.dry early return to avoid empty dir buildup)
@@ -65,6 +88,7 @@ def get_callbacks(FLAGS):
         save_freq='epoch',
         save_weights_only=True
     )
+    callbacks.append(chkpt_cb)
 
     # Log to Tensorboard
     tensorboard_cb = tf.keras.callbacks.TensorBoard(
@@ -76,14 +100,9 @@ def get_callbacks(FLAGS):
     )
     file_writer = tf.summary.create_file_writer(tb_dir + "/metrics")
     file_writer.set_as_default()
+    callbacks.append(tensorboard_cb)
 
     # Return callback list
-    callbacks = [
-        chkpt_cb,
-        tensorboard_cb,
-        learnrate_cb,
-        stopping_cb
-    ]
     return callbacks
 
 def save_summary(model, filepath, line_length=80):

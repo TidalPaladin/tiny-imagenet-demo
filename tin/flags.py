@@ -73,7 +73,7 @@ flags.DEFINE_integer(
 
 flags.DEFINE_float(
     'validation_split',
-    0.05,
+    0.1,
     'Fraction of dataset to reserve for validation'
 )
 
@@ -81,6 +81,43 @@ flags.DEFINE_float(
     'lr',
     0.001,
     'Initial learning rate'
+)
+
+flags.DEFINE_float(
+    'lr_decay_coeff',
+    None,
+    ('Coefficient for learning rate decay. '
+     'LR decay is given by e^(coeff * (epoch - interval))')
+)
+
+flags.DEFINE_integer(
+    'lr_decay_freq',
+    10,
+    'Number of epochs between learning rate decay'
+)
+
+flags.DEFINE_float(
+    'l1',
+    None,
+    'L1 norm for head'
+)
+
+flags.DEFINE_float(
+    'l2',
+    None,
+    'L2 norm for head'
+)
+
+flags.DEFINE_float(
+    'dropout',
+    None,
+    'Dropout ratio'
+)
+
+flags.DEFINE_integer(
+    'seed',
+    42,
+    'If set, the integer to seed all random generators with'
 )
 
 flags.DEFINE_string(
@@ -165,6 +202,42 @@ flags.register_validator(
     'lr',
     lambda v: 0 < v < 1.0,
     message='--lr must be an float on interval (0.0, 1.0)'
+)
+
+flags.register_validator(
+    'lr_decay_coeff',
+    lambda v: v == None or float(v) > 0,
+    message='--lr_decay_coeff must None or float > 0'
+)
+
+flags.register_validator(
+    'lr_decay_freq',
+    lambda v: int(v) > 0,
+    message='--lr_decay_freq must int > 0'
+)
+
+flags.register_validator(
+    'l1',
+    lambda v: v == None or v > 0,
+    message='--l1 must be a float > 0. Use l1=None for no regularization'
+)
+
+flags.register_validator(
+    'l2',
+    lambda v: v == None or v > 0,
+    message='--l2 must be a float > 0. Use l2=None for no regularization'
+)
+
+flags.register_validator(
+    'dropout',
+    lambda v: v == None or (float(v) > 0 and float(v) <= 1.0),
+    message='--dropout must be a float on [0, 1.0].'
+)
+
+flags.register_validator(
+    'seed',
+    lambda v: v == None or int(v) == v,
+    message='--seed must be None or an integer'
 )
 
 flags.register_validator(
