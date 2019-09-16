@@ -84,6 +84,19 @@ flags.DEFINE_float(
 )
 
 flags.DEFINE_float(
+    'lr_decay_coeff',
+    None,
+    ('Coefficient for learning rate decay. '
+     'LR decay is given by e^(coeff * (epoch - interval))')
+)
+
+flags.DEFINE_integer(
+    'lr_decay_freq',
+    10,
+    'Number of epochs between learning rate decay'
+)
+
+flags.DEFINE_float(
     'l1',
     None,
     'L1 norm for head'
@@ -186,6 +199,17 @@ flags.register_validator(
 )
 
 flags.register_validator(
+    'lr_decay_coeff',
+    lambda v: v == None or float(v) > 0,
+    message='--lr_decay_coeff must None or float > 0'
+)
+
+flags.register_validator(
+    'lr_decay_freq',
+    lambda v: int(v) > 0,
+    message='--lr_decay_freq must int > 0'
+)
+
 flags.register_validator(
     'l1',
     lambda v: v == None or v > 0,
