@@ -523,9 +523,6 @@ class InceptionMiniConv(layers.Layer):
         """
         super().__init__()
 
-        self.bn1 = layers.BatchNormalization()
-        self.relu1 = layers.ReLU()
-
         self.bottleneck = layers.Conv2D(
                 filters=out_width,
                 kernel_size=1,
@@ -581,9 +578,7 @@ class InceptionMiniConv(layers.Layer):
         """
 
         # Enter bottleneck, depthwise convolution
-        _ = self.bn1(inputs, training=training)
-        _ = self.relu1(_)
-        _ = self.bottleneck(_)
+        _ = self.bottleneck(inputs)
 
         for l in self.spatial_convs:
             if type(l) == layers.BatchNormalization():
