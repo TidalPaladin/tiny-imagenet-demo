@@ -4,8 +4,6 @@ set -o nounset
 set -o pipefail
 
 TB_DIR=/artifacts/tblogs
-echo "** Starting Tensorboard. Logdir=${TB_DIR} **"
-tensorboard --logdir=/artifacts/tblogs &
 
 if [[ "$*" = "/run.sh" ]]; then
 	echo "** Starting default training pipeline **"
