@@ -109,6 +109,12 @@ flags.DEFINE_integer(
 )
 
 flags.DEFINE_float(
+    'lr_decay_min',
+    0.0001,
+    'Minimum LR after decay'
+)
+
+flags.DEFINE_float(
     'l1',
     None,
     'L1 norm for head'
@@ -226,6 +232,12 @@ flags.register_validator(
     'lr_decay_freq',
     lambda v: int(v) > 0,
     message='--lr_decay_freq must int > 0'
+)
+
+flags.register_validator(
+    'lr_decay_min',
+    lambda v: float(v) > 0 and float(v) < FLAGS.lr,
+    message='--lr_decay_min must float on (0, --lr)'
 )
 
 flags.register_validator(

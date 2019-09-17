@@ -60,8 +60,10 @@ def get_callbacks(FLAGS):
             result = FLAGS.lr
         else:
             result = FLAGS.lr * (FLAGS.lr_decay_coeff ** (epoch - FLAGS.lr_decay_freq))
+
+        result = max(float(result), FLAGS.lr_decay_min)
         logging.info("Scheduled LR: %0.4f", result)
-        return float(result)
+        return result
 
     if FLAGS.lr_decay_coeff:
         lr_decay_args = {
