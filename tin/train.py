@@ -102,7 +102,7 @@ def construct_model():
 
     elif FLAGS.resnet:
         logging.info("Using Resnet network with %i classes", FLAGS.classes)
-        model = TinyInceptionNet(
+        model = TinyImageNet(
                 levels=FLAGS.levels,
                 width=32,
                 use_head=head,

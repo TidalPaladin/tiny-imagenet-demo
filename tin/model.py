@@ -314,6 +314,7 @@ class TinyImageNetHead(layers.Layer):
             self.dropout = layers.Dropout(dropout)
         else:
             logging.info("Not using dropout")
+            self.dropout = None
 
         self.dense = layers.Dense(
                 units=num_classes,
