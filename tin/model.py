@@ -581,7 +581,7 @@ class InceptionMiniConv(layers.Layer):
         _ = self.bottleneck(inputs)
 
         for l in self.spatial_convs:
-            if type(l) == layers.BatchNormalization():
+            if type(l) == layers.BatchNormalization:
                 _ = l(_, training=training)
             else:
                 _ = l(_)
