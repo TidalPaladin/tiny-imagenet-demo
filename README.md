@@ -143,8 +143,15 @@ Non-trainable params: 3,664
 ________________________________________________________________________________
 ```
 
-TODO Put some metrics about how well it does on old Tiny ImageNet or
-custom Tiny ImageNet.
+Currently, the [strongest model](./models/20190916-035525) reaches 46%
+validation accuracy and 73% top-5 validation accuracy. The model
+weights and a description of the architecture are available at the
+same location.  Work is
+currently underway to benchmark an Inception-style network with
+regularization techniques like dropout and L2 regularization, which
+will hopefully improve validation set performance. The aim here is to
+achieve reasonable testing performance without the use of transfer
+learning.
 
 The following model attributes are parameterized:
 
