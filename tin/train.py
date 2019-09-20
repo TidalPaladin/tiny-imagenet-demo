@@ -51,10 +51,19 @@ def preprocess():
     datagen = ImageDataGenerator(
             samplewise_center=True,
             samplewise_std_normalization=True,
-            rescale=1./255,
             horizontal_flip=True,
+            vertical_flip=True,
             data_format='channels_last',
             validation_split=FLAGS.validation_split,
+            rotation_range=10,
+            width_shift_range=0.10,
+            height_shift_range=0.10,
+            brightness_range=(-5, 5),
+            shear_range=1.5,
+            zoom_range=0.001,
+            channel_shift_range=0.001,
+            fill_mode='nearest',
+            cval=0.0,
     )
 
     # Create generator to yield a training set from directory
