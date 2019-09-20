@@ -86,7 +86,6 @@ def get_callbacks(FLAGS):
     chkpt_fmt = os.path.join(checkpoint_dir, FLAGS.checkpoint_fmt)
     chkpt_cb = ModelCheckpoint(
         filepath=chkpt_fmt,
-        save_freq='epoch',
         save_weights_only=True
     )
     callbacks.append(chkpt_cb)
@@ -95,12 +94,9 @@ def get_callbacks(FLAGS):
     tensorboard_cb = tf.keras.callbacks.TensorBoard(
         log_dir=os.path.join(tb_dir, DATE),
         write_graph=True,
-        histogram_freq=1,
-        embeddings_freq=3,
-        update_freq='epoch'
     )
-    file_writer = tf.summary.create_file_writer(tb_dir + "/metrics")
-    file_writer.set_as_default()
+    #file_writer = tf.summary.create_file_writer(tb_dir + "/metrics")
+    #file_writer.set_as_default()
     callbacks.append(tensorboard_cb)
 
     # Return callback list
