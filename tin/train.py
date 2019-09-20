@@ -177,6 +177,9 @@ def train_model(model, train, validate, initial_epoch):
     }
     pretty_args = json.dumps({k: str(v) for k, v in fit_args.items()}, indent=2)
 
+    logging.info("Writing training data images")
+    plot_inputs(train)
+
     logging.info("Fitting model with args: \n%s", pretty_args)
     history = model.fit_generator(**fit_args)
 

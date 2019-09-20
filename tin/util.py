@@ -19,6 +19,7 @@ from absl import logging
 
 # Used for directory / file names
 DATE = datetime.now().strftime("%Y%m%d-%H%M%S")
+TB_WRITER = None
 
 def get_callbacks(FLAGS):
     """ Gets model callbacks based on CLI flags """
@@ -91,12 +92,19 @@ def get_callbacks(FLAGS):
     callbacks.append(chkpt_cb)
 
     # Log to Tensorboard
+    logging.info(
+            "Tensorboard run dir: %s",
+            os.path.join(tb_dir, DATE)
+    )
     tensorboard_cb = tf.keras.callbacks.TensorBoard(
         log_dir=os.path.join(tb_dir, DATE),
         write_graph=True,
+        write_images=True
     )
-    #file_writer = tf.summary.create_file_writer(tb_dir + "/metrics")
-    #file_writer.set_as_default()
+    file_writer = tf.summary.create_file_writer(
+        os.path.join(tb_dir, DATE)
+    )
+    file_writer.set_as_default()
     callbacks.append(tensorboard_cb)
 
     # Return callback list
@@ -135,3 +143,16 @@ def get_last_checkpoint(checkpoint_dir):
     latest_checkpoint = sorted(list(latest_path.glob('*.hdf5')))[-1]
 
     return str(latest_checkpoint.resolve())
+
+def plot_inputs(img_gen):
+    for images, labels in img_gen:
+        tf.summary.image("train_data", images, step=0, max_outputs=25)
+        return
+
+def get_label_dict(path):
+    result = dict()
+    with open(path, 'r') as f:
+        for line in f:
+            synset, label = line.split('\t')
+            result[synset] = label
+    return result
