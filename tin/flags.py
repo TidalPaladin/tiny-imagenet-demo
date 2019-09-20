@@ -95,6 +95,18 @@ flags.DEFINE_float(
     'Fraction of dataset to reserve for validation'
 )
 
+flags.DEFINE_bool(
+    'adam',
+    False,
+    'Use the Adam optimizer'
+)
+
+flags.DEFINE_bool(
+    'rmsprop',
+    False,
+    'Use the RMSProp optimizer'
+)
+
 flags.DEFINE_float(
     'lr',
     0.001,
@@ -102,16 +114,43 @@ flags.DEFINE_float(
 )
 
 flags.DEFINE_float(
+    'epsilon',
+    1.0,
+    'Epsilon value for Adam/RMSProp optimizer'
+)
+
+flags.DEFINE_float(
+    'beta1',
+    0.9,
+    'Beta 1 value for Adam optimizer'
+)
+
+flags.DEFINE_float(
+    'beta2',
+    0.999,
+    'Beta 2 value for Adam optimizer'
+)
+
+flags.DEFINE_float(
+    'rho',
+    0.9,
+    'Rho value for RMSProp optimizer'
+)
+
+flags.DEFINE_float(
     'lr_decay_coeff',
-    None,
+    0.94,
     ('Coefficient for learning rate decay. '
-     'LR decay is given by e^(coeff * (epoch - interval))')
+     'LR decay is given by e^(coeff * (epoch - interval)). '
+     'Defaults to 0.94 as in Inception Resnet paper. '
+     'Set to None for no decay.')
 )
 
 flags.DEFINE_integer(
     'lr_decay_freq',
-    10,
-    'Number of epochs between learning rate decay'
+    2,
+    ('Number of epochs between learning rate decay. '
+     'Defaults to 2 as in Inception Resnet paper')
 )
 
 flags.DEFINE_float(
@@ -244,6 +283,30 @@ flags.register_validator(
     'lr',
     lambda v: 0 < v < 1.0,
     message='--lr must be an float on interval (0.0, 1.0)'
+)
+
+flags.register_validator(
+    'epsilon',
+    lambda v: float(v) >= 0,
+    message='--epsilon must be a float >= 0)'
+)
+
+flags.register_validator(
+    'beta1',
+    lambda v: float(v) >= 0,
+    message='--beta1 must be an float >= 0)'
+)
+
+flags.register_validator(
+    'beta2',
+    lambda v: float(v) >= 0,
+    message='--beta2 must be an float >= 0)'
+)
+
+flags.register_validator(
+    'rho',
+    lambda v: float(v) >= 0,
+    message='--rho must be an float >= 0)'
 )
 
 flags.register_validator(
