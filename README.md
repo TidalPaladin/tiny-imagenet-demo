@@ -143,23 +143,66 @@ Non-trainable params: 3,664
 ________________________________________________________________________________
 ```
 
-Currently, the [strongest model](./models/20190916-035525) reaches 46%
-validation accuracy and 73% top-5 validation accuracy. The model
-weights and a description of the architecture are available at the
-same location.  Work is
-currently underway to benchmark an Inception-style network with
-regularization techniques like dropout and L2 regularization, which
-will hopefully improve validation set performance. The aim here is to
-achieve reasonable testing performance without the use of transfer
-learning.
+Currently, the [strongest model](./models/20190919-040503) reaches 52%
+validation accuracy and 76% top-5 validation accuracy using a modified
+version of Inception-Resnet with no pretrained weights. The same model
+converged at 94% training accuracy and 99.8% top-5 training accuracy.
+
+Weights and a description of the architecture used for this model are
+available at the same location. The high level architecture of the
+inception-style model is as follows:
+
+```
+Model: "tiny_inception_net"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+inception_tail (InceptionTai (None, 64, 64, 64)        3387
+_________________________________________________________________
+incept_A_1 (InceptionResnetA (None, 64, 64, 64)        3664
+_________________________________________________________________
+incept_A_2 (InceptionResnetA (None, 64, 64, 64)        3664
+_________________________________________________________________
+reduct_A_1 (InceptionReducti (None, 32, 32, 192)       9600
+_________________________________________________________________
+incept_B_1 (InceptionResnetB (None, 32, 32, 192)       19824
+_________________________________________________________________
+incept_B_2 (InceptionResnetB (None, 32, 32, 192)       19824
+_________________________________________________________________
+incept_B_3 (InceptionResnetB (None, 32, 32, 192)       19824
+_________________________________________________________________
+incept_B_4 (InceptionResnetB (None, 32, 32, 192)       19824
+_________________________________________________________________
+reduct_B_2 (InceptionReducti (None, 16, 16, 768)       118272
+_________________________________________________________________
+incept_C_1 (InceptionResnetC (None, 16, 16, 768)       300480
+_________________________________________________________________
+incept_C_2 (InceptionResnetC (None, 16, 16, 768)       300480
+_________________________________________________________________
+bn (BatchNormalization)      (None, 16, 16, 768)       3072
+_________________________________________________________________
+relu (ReLU)                  (None, 16, 16, 768)       0
+_________________________________________________________________
+head (TinyImageNetHead)      (None, 200)               153800
+=================================================================
+Total params: 975,715
+Trainable params: 966,851
+Non-trainable params: 8,864
+_________________________________________________________________
+```
 
 The following model attributes are parameterized:
 
-1. Whether to use a default `7x7/1` tail, user supplied tail, or no tail.
+1. Whether to use a default tail, user supplied tail, or no tail.
 2. Whether to use a default head, user supplied head, or no head.
 3. The number of output classes (if using the default head).
 4. The number of downsampling levels, and the number of bottleneck layers within each level.
-5. The model width (by supplying a custom tail).
+5. The model width.
+6. Training hyperparameters (learning rate, lr decay, regularization)
+7. The use of dropout before the FC layer in the head
+
+More complex parameterizations are available for the inception style
+variant and are documented in the relevant code.
 
 ## Dataset
 
