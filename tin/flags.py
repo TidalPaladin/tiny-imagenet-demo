@@ -31,6 +31,12 @@ flags.DEFINE_bool(
     'If true, use an Inception style network'
 )
 
+flags.DEFINE_integer(
+    'width',
+    32,
+    'Network width at output of tail'
+)
+
 flags.DEFINE_bool(
     'dry',
     False,

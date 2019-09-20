@@ -95,7 +95,7 @@ def construct_model():
         logging.info("Using Inception network with %i classes", FLAGS.classes)
         model = TinyInceptionNet(
                 levels=FLAGS.levels,
-                width=32,
+                width=FLAGS.width,
                 use_head=head,
                 use_tail=True
         )
@@ -104,7 +104,7 @@ def construct_model():
         logging.info("Using Resnet network with %i classes", FLAGS.classes)
         model = TinyImageNet(
                 levels=FLAGS.levels,
-                width=32,
+                width=FLAGS.width,
                 use_head=head,
                 use_tail=True
         )
