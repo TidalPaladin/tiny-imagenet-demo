@@ -99,6 +99,7 @@ def construct_model():
                             l1=FLAGS.l1,
                             l2=FLAGS.l2,
                             dropout=FLAGS.dropout,
+                            seed=FLAGS.seed,
                             name='head')
 
     if FLAGS.inception:

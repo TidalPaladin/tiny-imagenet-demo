@@ -305,7 +305,7 @@ class TinyImageNetHead(layers.Layer):
 
         return regularize
 
-    def __init__(self, num_classes, l1=0.0, l2=0.0, dropout=None, **kwargs):
+    def __init__(self, num_classes, l1=0.0, l2=0.0, dropout=None, seed=None, **kwargs):
         """
         Arguments:
             num_classes: Positive integer, number of classes in the output of the
@@ -314,6 +314,7 @@ class TinyImageNetHead(layers.Layer):
             l1: Positive float, l1 regularization lambda
             l2: Positive float, l2 regularization lambda
             dropout: Positive float, dropout ratio between GAP and FC layers
+            seed: Integer, random seed for dropout
 
         Keyword Arguments:
             Forwarded to the dense layer.
@@ -327,7 +328,7 @@ class TinyImageNetHead(layers.Layer):
 
         if dropout:
             logging.info("Using dropout=%f", dropout)
-            self.dropout = layers.Dropout(dropout)
+            self.dropout = layers.Dropout(rate=dropout, seed=seed)
         else:
             logging.info("Not using dropout")
             self.dropout = None
