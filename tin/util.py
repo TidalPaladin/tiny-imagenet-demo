@@ -57,11 +57,9 @@ def get_callbacks(FLAGS):
 
     # Decay LR exponentially over epochs
     def scheduler(epoch):
-        if epoch < FLAGS.lr_decay_freq:
-            result = FLAGS.lr
-        else:
-            result = FLAGS.lr * (FLAGS.lr_decay_coeff ** (epoch - FLAGS.lr_decay_freq))
 
+        decay = FLAGS.lr_decay_coeff ** (epoch // FLAGS.lr_decay_freq)
+        result = FLAGS.lr * decay
         result = max(float(result), FLAGS.lr_decay_min)
         logging.info("Scheduled LR: %0.4f", result)
         return result
