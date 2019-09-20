@@ -50,21 +50,16 @@ def preprocess():
     # Training / validation split is specified here
     # TODO get all these params from FLAGS
     datagen = ImageDataGenerator(
-            samplewise_center=True,
-            samplewise_std_normalization=True,
+            #samplewise_center=True,
+            #samplewise_std_normalization=True,
             horizontal_flip=True,
-            vertical_flip=True,
             data_format='channels_last',
             validation_split=FLAGS.validation_split,
-            rotation_range=10,
-            width_shift_range=0.10,
-            height_shift_range=0.10,
-            brightness_range=(-5, 5),
-            shear_range=1.5,
-            zoom_range=0.001,
-            channel_shift_range=0.001,
-            fill_mode='nearest',
-            cval=0.0,
+            rotation_range=45,
+            width_shift_range=0.1,
+            height_shift_range=0.1,
+            zoom_range=0.1,
+            rescale=1./255
     )
 
     # Create generator to yield a training set from directory
