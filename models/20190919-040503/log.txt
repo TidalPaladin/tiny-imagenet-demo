@@ -1,0 +1,265 @@
+docker-compose run tiny-imagenet --classes=200 --levels=2,4,2 --lr=0.002 --lr_decay_coeff=0.75 --lr_decay_freq=10 --batch_size=32 --dropout=0.2 --inception --width 64
+** Starting default training pipeline with user flags **
+I0919 04:05:03.406132 139908565825344 model.py:329] Using dropout=0.200000
+I0919 04:05:03.409820 139908565825344 train.py:95] Using Inception network with 200 classes
+I0919 04:05:03.410806 139908565825344 model.py:1109] Building InceptionNet model: levels=[2, 4, 2], width=64
+2019-09-19 04:05:03.863261: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2019-09-19 04:05:03.867302: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties:
+name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.253
+pciBusID: 0000:03:00.0
+2019-09-19 04:05:03.867437: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-09-19 04:05:03.868495: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-09-19 04:05:03.869380: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2019-09-19 04:05:03.869595: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2019-09-19 04:05:03.870849: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2019-09-19 04:05:03.871749: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2019-09-19 04:05:03.874638: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-09-19 04:05:03.875723: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0
+2019-09-19 04:05:03.875954: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2019-09-19 04:05:03.880789: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 3820310000 Hz
+2019-09-19 04:05:03.881346: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x412d200 executing computations on platform Host. Devices:
+2019-09-19 04:05:03.881366: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): Host, Default Version
+2019-09-19 04:05:03.941501: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x41a97c0 executing computations on platform CUDA. Devices:
+2019-09-19 04:05:03.941522: I tensorflow/compiler/xla/service/service.cc:175]   StreamExecutor device (0): GeForce GTX 970, Compute Capability 5.2
+2019-09-19 04:05:03.941965: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties:
+name: GeForce GTX 970 major: 5 minor: 2 memoryClockRate(GHz): 1.253
+pciBusID: 0000:03:00.0
+2019-09-19 04:05:03.941995: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-09-19 04:05:03.942005: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-09-19 04:05:03.942014: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2019-09-19 04:05:03.942027: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2019-09-19 04:05:03.942038: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2019-09-19 04:05:03.942046: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2019-09-19 04:05:03.942055: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-09-19 04:05:03.942739: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0
+2019-09-19 04:05:03.942768: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-09-19 04:05:03.943315: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1159] Device interconnect StreamExecutor with strength 1 edge matrix:
+2019-09-19 04:05:03.943328: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1165]      0
+2019-09-19 04:05:03.943334: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1178] 0:   N
+2019-09-19 04:05:03.944064: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1304] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 3673 MB memory) -> physical GPU (device: 0, name: GeForce GTX 970, pci bus id: 0000:03:00.0, compute capability: 5.2)
+I0919 04:05:06.478299 139908565825344 util.py:118] Removing empty directory: /artifacts/checkpoint/20190919-035158
+I0919 04:05:06.479466 139908565825344 util.py:29] Model checkpoint dir: /artifacts/checkpoint/20190919-040503
+I0919 04:05:06.479539 139908565825344 util.py:31] Tensorboard log dir: /artifacts/tblogs
+I0919 04:05:06.479595 139908565825344 util.py:43] ReduceLROnPlateau: {'monitor': 'loss', 'factor': 0.5, 'patience': 5, 'min_delta': 0.01, 'cooldown': 2, 'min_lr': 0.0001}
+I0919 04:05:06.479693 139908565825344 util.py:53] EarlyStopping: {'monitor': 'loss', 'min_delta': 0.01, 'patience': 5}
+I0919 04:05:06.479791 139908565825344 util.py:71] LRDecay: {'interval': 10, 'coeff': 0.75}
+I0919 04:05:06.479972 139908565825344 train.py:42] Reading images from: /data/src
+Found 90000 images belonging to 200 classes.
+Found 10000 images belonging to 200 classes.
+I0919 04:05:10.460270 139908565825344 train.py:150] Fitting model with args:
+{
+  "generator": "<keras_preprocessing.image.directory_iterator.DirectoryIterator object at 0x7f3e902d22e8>",
+  "epochs": "100",
+  "validation_data": "<keras_preprocessing.image.directory_iterator.DirectoryIterator object at 0x7f3e085370b8>",
+  "callbacks": "[<tensorflow.python.keras.callbacks.ReduceLROnPlateau object at 0x7f3e902cf208>, <tensorflow.python.keras.callbacks.EarlyStopping object at 0x7f3e902cf1d0>, <tensorflow.python.keras.callbacks.LearningRateScheduler object at 0x7f3e902cf438>, <tensorflow.python.keras.callbacks.ModelCheckpoint object at 0x7f3e902cf240>, <tensorflow.python.keras.callbacks.TensorBoard object at 0x7f3e902d2080>]",
+  "initial_epoch": "0"
+}
+I0919 04:05:10.584246 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 1/100
+2019-09-19 04:05:10.615562: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-09-19 04:05:10.772772: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-09-19 04:05:12.154514: I tensorflow/core/profiler/lib/profiler_session.cc:184] Profiler session started.
+2019-09-19 04:05:12.155226: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcupti.so.10.0
+   1/2813 [..............................] - ETA: 1:21:08 - loss: 5.4548 - acc: 0.0000e+00 - top_5_acc: 0.03122019-09-19 04:05:12.771254: I tensorflow/core/platform/default/device_tracer.cc:588] Collecting 1453 kernel records, 302 memcpy records.
+2813/2813 [==============================] - 1242s 442ms/step - loss: 4.3838 - acc: 0.0831 - top_5_acc: 0.2469 - val_loss: 5.2405 - val_acc: 0.1363 - val_top_5_acc: 0.3457
+I0919 04:25:52.902152 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 2/100
+2813/2813 [==============================] - 1243s 442ms/step - loss: 3.4790 - acc: 0.2107 - top_5_acc: 0.4695 - val_loss: 5.1811 - val_acc: 0.2327 - val_top_5_acc: 0.4804
+I0919 04:46:35.818728 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 3/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 3.0158 - acc: 0.2986 - top_5_acc: 0.5727 - val_loss: 5.1119 - val_acc: 0.3256 - val_top_5_acc: 0.5977
+I0919 05:07:19.512209 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 4/100
+2813/2813 [==============================] - 1243s 442ms/step - loss: 2.7269 - acc: 0.3555 - top_5_acc: 0.6344 - val_loss: 5.0656 - val_acc: 0.3784 - val_top_5_acc: 0.6457
+I0919 05:28:02.983078 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 5/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 2.5040 - acc: 0.4015 - top_5_acc: 0.6786 - val_loss: 5.0420 - val_acc: 0.3973 - val_top_5_acc: 0.6664
+I0919 05:48:46.558339 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 6/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 2.3300 - acc: 0.4356 - top_5_acc: 0.7116 - val_loss: 5.0131 - val_acc: 0.4163 - val_top_5_acc: 0.6900
+I0919 06:09:30.779881 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 7/100
+2813/2813 [==============================] - 1245s 442ms/step - loss: 2.1830 - acc: 0.4678 - top_5_acc: 0.7373 - val_loss: 4.9894 - val_acc: 0.4421 - val_top_5_acc: 0.7074
+I0919 06:30:15.353277 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 8/100
+2813/2813 [==============================] - 1245s 442ms/step - loss: 2.0641 - acc: 0.4926 - top_5_acc: 0.7591 - val_loss: 4.9704 - val_acc: 0.4586 - val_top_5_acc: 0.7223
+I0919 06:50:59.962163 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 9/100
+2813/2813 [==============================] - 1245s 443ms/step - loss: 1.9556 - acc: 0.5132 - top_5_acc: 0.7769 - val_loss: 4.9487 - val_acc: 0.4858 - val_top_5_acc: 0.7395
+I0919 07:11:44.742828 139908565825344 util.py:63] Scheduled LR: 0.0020
+Epoch 10/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.8634 - acc: 0.5341 - top_5_acc: 0.7932 - val_loss: 4.9379 - val_acc: 0.4772 - val_top_5_acc: 0.7431
+I0919 07:32:29.151365 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 11/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.6971 - acc: 0.5698 - top_5_acc: 0.8177 - val_loss: 4.8989 - val_acc: 0.5155 - val_top_5_acc: 0.7617
+I0919 07:53:13.510235 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 12/100
+2813/2813 [==============================] - 1245s 442ms/step - loss: 1.6120 - acc: 0.5865 - top_5_acc: 0.8318 - val_loss: 4.8892 - val_acc: 0.5088 - val_top_5_acc: 0.7605
+I0919 08:13:58.050667 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 13/100
+2813/2813 [==============================] - 1245s 442ms/step - loss: 1.5450 - acc: 0.6016 - top_5_acc: 0.8426 - val_loss: 4.8942 - val_acc: 0.5169 - val_top_5_acc: 0.7650
+I0919 08:34:42.753199 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 14/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.4837 - acc: 0.6149 - top_5_acc: 0.8517 - val_loss: 4.8883 - val_acc: 0.5223 - val_top_5_acc: 0.7667
+I0919 08:55:26.862765 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 15/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.4264 - acc: 0.6271 - top_5_acc: 0.8600 - val_loss: 4.8691 - val_acc: 0.5218 - val_top_5_acc: 0.7682
+I0919 09:16:10.607202 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 16/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.3758 - acc: 0.6381 - top_5_acc: 0.8678 - val_loss: 4.8759 - val_acc: 0.5146 - val_top_5_acc: 0.7734
+I0919 09:36:55.033325 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 17/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.3209 - acc: 0.6492 - top_5_acc: 0.8778 - val_loss: 4.8702 - val_acc: 0.5216 - val_top_5_acc: 0.7652
+I0919 09:57:39.101294 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 18/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.2760 - acc: 0.6589 - top_5_acc: 0.8852 - val_loss: 4.8586 - val_acc: 0.5258 - val_top_5_acc: 0.7731
+I0919 10:18:23.295916 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 19/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.2253 - acc: 0.6714 - top_5_acc: 0.8916 - val_loss: 4.8636 - val_acc: 0.5231 - val_top_5_acc: 0.7665
+I0919 10:39:07.151698 139908565825344 util.py:63] Scheduled LR: 0.0015
+Epoch 20/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.1806 - acc: 0.6783 - top_5_acc: 0.8974 - val_loss: 4.8683 - val_acc: 0.5109 - val_top_5_acc: 0.7559
+I0919 10:59:51.593994 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 21/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.0575 - acc: 0.7108 - top_5_acc: 0.9153 - val_loss: 4.8395 - val_acc: 0.5329 - val_top_5_acc: 0.7769
+I0919 11:20:35.761631 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 22/100
+2813/2813 [==============================] - 1244s 442ms/step - loss: 1.0122 - acc: 0.7191 - top_5_acc: 0.9210 - val_loss: 4.8373 - val_acc: 0.5360 - val_top_5_acc: 0.7792
+I0919 11:41:20.146661 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 23/100
+2813/2813 [==============================] - 1245s 442ms/step - loss: 0.9771 - acc: 0.7271 - top_5_acc: 0.9255 - val_loss: 4.8533 - val_acc: 0.5294 - val_top_5_acc: 0.7687
+I0919 12:02:04.884722 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 24/100
+2813/2813 [==============================] - 1263s 449ms/step - loss: 0.9348 - acc: 0.7380 - top_5_acc: 0.9314 - val_loss: 4.8399 - val_acc: 0.5302 - val_top_5_acc: 0.7742
+I0919 12:23:08.227746 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 25/100
+2813/2813 [==============================] - 1267s 451ms/step - loss: 0.9035 - acc: 0.7449 - top_5_acc: 0.9351 - val_loss: 4.8432 - val_acc: 0.5220 - val_top_5_acc: 0.7669
+I0919 12:44:15.683406 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 26/100
+2813/2813 [==============================] - 1258s 447ms/step - loss: 0.8776 - acc: 0.7501 - top_5_acc: 0.9373 - val_loss: 4.8309 - val_acc: 0.5327 - val_top_5_acc: 0.7712
+I0919 13:05:13.746797 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 27/100
+2813/2813 [==============================] - 1250s 444ms/step - loss: 0.8467 - acc: 0.7578 - top_5_acc: 0.9425 - val_loss: 4.8329 - val_acc: 0.5319 - val_top_5_acc: 0.7702
+I0919 13:26:03.304711 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 28/100
+2813/2813 [==============================] - 1250s 444ms/step - loss: 0.8136 - acc: 0.7639 - top_5_acc: 0.9474 - val_loss: 4.8347 - val_acc: 0.5244 - val_top_5_acc: 0.7658
+I0919 13:46:53.003814 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 29/100
+2813/2813 [==============================] - 1250s 444ms/step - loss: 0.7868 - acc: 0.7710 - top_5_acc: 0.9500 - val_loss: 4.8330 - val_acc: 0.5274 - val_top_5_acc: 0.7704
+I0919 14:07:42.995961 139908565825344 util.py:63] Scheduled LR: 0.0011
+Epoch 30/100
+2813/2813 [==============================] - 1250s 444ms/step - loss: 0.7645 - acc: 0.7773 - top_5_acc: 0.9528 - val_loss: 4.8345 - val_acc: 0.5260 - val_top_5_acc: 0.7655
+I0919 14:28:32.929904 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 31/100
+2813/2813 [==============================] - 1250s 444ms/step - loss: 0.6705 - acc: 0.8047 - top_5_acc: 0.9619 - val_loss: 4.8236 - val_acc: 0.5308 - val_top_5_acc: 0.7702
+I0919 14:49:22.831943 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 32/100
+2813/2813 [==============================] - 1251s 445ms/step - loss: 0.6383 - acc: 0.8114 - top_5_acc: 0.9662 - val_loss: 4.8230 - val_acc: 0.5325 - val_top_5_acc: 0.7727
+I0919 15:10:14.024723 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 33/100
+2813/2813 [==============================] - 1265s 450ms/step - loss: 0.6158 - acc: 0.8168 - top_5_acc: 0.9689 - val_loss: 4.8237 - val_acc: 0.5309 - val_top_5_acc: 0.7703
+I0919 15:31:18.617925 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 34/100
+2813/2813 [==============================] - 1267s 451ms/step - loss: 0.5913 - acc: 0.8233 - top_5_acc: 0.9712 - val_loss: 4.8285 - val_acc: 0.5303 - val_top_5_acc: 0.7650
+I0919 15:52:25.946904 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 35/100
+2813/2813 [==============================] - 1266s 450ms/step - loss: 0.5784 - acc: 0.8267 - top_5_acc: 0.9719 - val_loss: 4.8236 - val_acc: 0.5212 - val_top_5_acc: 0.7659
+I0919 16:13:31.562231 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 36/100
+2813/2813 [==============================] - 1265s 450ms/step - loss: 0.5582 - acc: 0.8328 - top_5_acc: 0.9746 - val_loss: 4.8213 - val_acc: 0.5277 - val_top_5_acc: 0.7640
+I0919 16:34:36.515133 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 37/100
+2813/2813 [==============================] - 1259s 447ms/step - loss: 0.5388 - acc: 0.8367 - top_5_acc: 0.9768 - val_loss: 4.8226 - val_acc: 0.5325 - val_top_5_acc: 0.7693
+I0919 16:55:35.336924 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 38/100
+2813/2813 [==============================] - 1264s 450ms/step - loss: 0.5264 - acc: 0.8395 - top_5_acc: 0.9777 - val_loss: 4.8250 - val_acc: 0.5247 - val_top_5_acc: 0.7685
+I0919 17:16:39.831818 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 39/100
+2813/2813 [==============================] - 1263s 449ms/step - loss: 0.5143 - acc: 0.8424 - top_5_acc: 0.9788 - val_loss: 4.8241 - val_acc: 0.5220 - val_top_5_acc: 0.7628
+I0919 17:37:42.472526 139908565825344 util.py:63] Scheduled LR: 0.0008
+Epoch 40/100
+2813/2813 [==============================] - 1258s 447ms/step - loss: 0.4964 - acc: 0.8495 - top_5_acc: 0.9799 - val_loss: 4.8198 - val_acc: 0.5261 - val_top_5_acc: 0.7675
+I0919 17:58:40.147381 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 41/100
+2813/2813 [==============================] - 1264s 449ms/step - loss: 0.4278 - acc: 0.8691 - top_5_acc: 0.9852 - val_loss: 4.8127 - val_acc: 0.5319 - val_top_5_acc: 0.7703
+I0919 18:19:43.959592 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 42/100
+2813/2813 [==============================] - 1259s 448ms/step - loss: 0.4225 - acc: 0.8701 - top_5_acc: 0.9859 - val_loss: 4.8185 - val_acc: 0.5259 - val_top_5_acc: 0.7653
+I0919 18:40:43.382472 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 43/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.4000 - acc: 0.8773 - top_5_acc: 0.9869 - val_loss: 4.8126 - val_acc: 0.5272 - val_top_5_acc: 0.7656
+I0919 19:01:43.163045 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 44/100
+2813/2813 [==============================] - 1263s 449ms/step - loss: 0.3917 - acc: 0.8794 - top_5_acc: 0.9881 - val_loss: 4.8115 - val_acc: 0.5305 - val_top_5_acc: 0.7664
+I0919 19:22:46.239470 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 45/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.3816 - acc: 0.8824 - top_5_acc: 0.9883 - val_loss: 4.8138 - val_acc: 0.5262 - val_top_5_acc: 0.7674
+I0919 19:43:47.045948 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 46/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.3721 - acc: 0.8851 - top_5_acc: 0.9901 - val_loss: 4.8122 - val_acc: 0.5249 - val_top_5_acc: 0.7638
+I0919 20:04:47.361027 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 47/100
+2813/2813 [==============================] - 1264s 449ms/step - loss: 0.3650 - acc: 0.8862 - top_5_acc: 0.9905 - val_loss: 4.8141 - val_acc: 0.5224 - val_top_5_acc: 0.7645
+I0919 20:25:51.430191 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 48/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.3527 - acc: 0.8907 - top_5_acc: 0.9911 - val_loss: 4.8109 - val_acc: 0.5266 - val_top_5_acc: 0.7682
+I0919 20:46:52.816663 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 49/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.3375 - acc: 0.8943 - top_5_acc: 0.9917 - val_loss: 4.8113 - val_acc: 0.5242 - val_top_5_acc: 0.7673
+I0919 21:07:53.291656 139908565825344 util.py:63] Scheduled LR: 0.0006
+Epoch 50/100
+2813/2813 [==============================] - 1268s 451ms/step - loss: 0.3381 - acc: 0.8943 - top_5_acc: 0.9920 - val_loss: 4.8121 - val_acc: 0.5242 - val_top_5_acc: 0.7640
+I0919 21:29:01.555958 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 51/100
+2813/2813 [==============================] - 1258s 447ms/step - loss: 0.2975 - acc: 0.9072 - top_5_acc: 0.9939 - val_loss: 4.8054 - val_acc: 0.5331 - val_top_5_acc: 0.7702
+I0919 21:50:00.066308 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 52/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.2840 - acc: 0.9108 - top_5_acc: 0.9946 - val_loss: 4.8092 - val_acc: 0.5263 - val_top_5_acc: 0.7653
+I0919 22:11:00.602459 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 53/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.2765 - acc: 0.9136 - top_5_acc: 0.9950 - val_loss: 4.8066 - val_acc: 0.5274 - val_top_5_acc: 0.7668
+I0919 22:32:00.726633 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 54/100
+2813/2813 [==============================] - 1263s 449ms/step - loss: 0.2688 - acc: 0.9162 - top_5_acc: 0.9951 - val_loss: 4.8107 - val_acc: 0.5232 - val_top_5_acc: 0.7657
+I0919 22:53:03.709980 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 55/100
+2813/2813 [==============================] - 1257s 447ms/step - loss: 0.2670 - acc: 0.9167 - top_5_acc: 0.9956 - val_loss: 4.8121 - val_acc: 0.5241 - val_top_5_acc: 0.7624
+I0919 23:14:01.167619 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 56/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.2582 - acc: 0.9196 - top_5_acc: 0.9953 - val_loss: 4.8126 - val_acc: 0.5226 - val_top_5_acc: 0.7629
+I0919 23:35:01.436723 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 57/100
+2813/2813 [==============================] - 1263s 449ms/step - loss: 0.2557 - acc: 0.9209 - top_5_acc: 0.9954 - val_loss: 4.8077 - val_acc: 0.5242 - val_top_5_acc: 0.7652
+I0919 23:56:04.873235 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 58/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.2466 - acc: 0.9235 - top_5_acc: 0.9961 - val_loss: 4.8076 - val_acc: 0.5242 - val_top_5_acc: 0.7615
+I0920 00:17:05.880657 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 59/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.2419 - acc: 0.9246 - top_5_acc: 0.9962 - val_loss: 4.8056 - val_acc: 0.5276 - val_top_5_acc: 0.7637
+I0920 00:38:05.447118 139908565825344 util.py:63] Scheduled LR: 0.0005
+Epoch 60/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.2411 - acc: 0.9239 - top_5_acc: 0.9963 - val_loss: 4.8096 - val_acc: 0.5245 - val_top_5_acc: 0.7604
+I0920 00:59:05.224318 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 61/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.2117 - acc: 0.9348 - top_5_acc: 0.9973 - val_loss: 4.8060 - val_acc: 0.5280 - val_top_5_acc: 0.7653
+I0920 01:20:05.891796 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 62/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.2057 - acc: 0.9366 - top_5_acc: 0.9974 - val_loss: 4.8043 - val_acc: 0.5281 - val_top_5_acc: 0.7665
+I0920 01:41:07.105582 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 63/100
+2813/2813 [==============================] - 1261s 448ms/step - loss: 0.2064 - acc: 0.9362 - top_5_acc: 0.9975 - val_loss: 4.8039 - val_acc: 0.5270 - val_top_5_acc: 0.7620
+I0920 02:02:08.494526 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 64/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.1986 - acc: 0.9376 - top_5_acc: 0.9978 - val_loss: 4.8036 - val_acc: 0.5230 - val_top_5_acc: 0.7656
+I0920 02:23:08.171440 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 65/100
+2813/2813 [==============================] - 1264s 449ms/step - loss: 0.1898 - acc: 0.9421 - top_5_acc: 0.9981 - val_loss: 4.8034 - val_acc: 0.5246 - val_top_5_acc: 0.7629
+I0920 02:44:11.904418 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 66/100
+2813/2813 [==============================] - 1263s 449ms/step - loss: 0.1884 - acc: 0.9421 - top_5_acc: 0.9979 - val_loss: 4.8036 - val_acc: 0.5249 - val_top_5_acc: 0.7647
+I0920 03:05:15.229432 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 67/100
+2813/2813 [==============================] - 1260s 448ms/step - loss: 0.1878 - acc: 0.9416 - top_5_acc: 0.9980 - val_loss: 4.8060 - val_acc: 0.5231 - val_top_5_acc: 0.7664
+I0920 03:26:15.693301 139908565825344 util.py:63] Scheduled LR: 0.0004
+Epoch 68/100
+1398/2813 [=============>................] - ETA: 10:15 - loss: 0.1759 - acc: 0.9455 - top_5_acc: 0.9982^CTraceback (most recent call last):
