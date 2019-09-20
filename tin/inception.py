@@ -460,14 +460,14 @@ class InceptionTail(layers.Layer):
                 filters=out_width // 4,
                 name=self.name+'_conv2',
                 kernel_size=3,
-                strides=1,
+                strides=2,
                 padding='same',
                 use_bias=False,
                 activation=None,
         )
         self.pool1 = layers.MaxPooling2D(
             pool_size=3,
-            strides=1,
+            strides=2,
             name=self.name+'_pool1',
             padding='same'
         )
