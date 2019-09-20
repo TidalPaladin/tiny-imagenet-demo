@@ -114,6 +114,24 @@ flags.DEFINE_float(
     'Minimum LR after decay'
 )
 
+flags.DEFINE_string(
+    'early_stopping',
+    None,
+    'Metric to watch for early stopping. Ex: loss'
+)
+
+flags.DEFINE_integer(
+    'stopping_patience',
+    5,
+    'Epochs to wait before stopping if metric does not improve'
+)
+
+flags.DEFINE_float(
+    'stopping_change',
+    0.01,
+    'Minimum change in watched metric to be considered an improvement'
+)
+
 flags.DEFINE_float(
     'l1',
     None,

@@ -45,14 +45,15 @@ def get_callbacks(FLAGS):
     callbacks.append(learnrate_cb)
 
     # Stop early if loss isn't improving
-    stopping_args = {
-            'monitor':'loss',
-            'min_delta': 0.01,
-            'patience': 5,
-    }
-    logging.info("EarlyStopping: %s", stopping_args)
-    stopping_cb = tf.keras.callbacks.EarlyStopping(**stopping_args)
-    callbacks.append(stopping_cb)
+    if FLAGS.early_stopping:
+        stopping_args = {
+                'monitor':FLAGS.early_stopping,
+                'min_delta': FLAGS.stopping_change,
+                'patience': FLAGS.stopping_patience,
+        }
+        logging.info("EarlyStopping: %s", stopping_args)
+        stopping_cb = tf.keras.callbacks.EarlyStopping(**stopping_args)
+        callbacks.append(stopping_cb)
 
     # Decay LR exponentially over epochs
     def scheduler(epoch):
