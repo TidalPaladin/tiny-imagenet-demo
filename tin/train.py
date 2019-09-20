@@ -18,7 +18,8 @@ from tensorflow.data.experimental import AUTOTUNE
 from pathlib import Path
 from glob import glob as glob_func
 from util import *
-from model import *
+from inception import *
+from resnet import *
 
 from tensorboard.plugins.hparams import api as hp
 import tensorflow.feature_column as fc
