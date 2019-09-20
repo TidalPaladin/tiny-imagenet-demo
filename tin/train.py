@@ -166,6 +166,7 @@ def main(argv):
     Main method, must call this method with app.main() for absl-py libraries to
     work as intended
     """
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
     # Specify input shape for model.summary(). Batch dimension always excluded
     image_shape = (FLAGS.image_dim, FLAGS.image_dim, 3)
