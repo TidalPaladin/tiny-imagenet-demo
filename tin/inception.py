@@ -1,6 +1,14 @@
 """
 This module provides a Tensorflow 2.0 implementation of a vision
 classification network for Tiny ImageNet based on Inception-Resnet.
+
+NOTES / TODO:
+
+1.  In the Inception Resnet paper, batch norm was omitted after the
+    residual + main path additions to reduce memory requirements.
+    This may benefit this model by allowing for larger batch sizes at
+    a similar memory footprint, which in turn would allow for higher
+    learning rates.
 """
 import tensorflow as tf
 from tensorflow.keras import layers
