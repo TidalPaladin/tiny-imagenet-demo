@@ -13,11 +13,12 @@ NOTES / TODO:
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import Model, Sequential
-from resnet import TinyImageNetHead, TinyImageNet
+from tin.resnet import TinyImageNetHead, TinyImageNet
 
 from absl import logging
 
-class InceptionMiniConv(layers.Layer):
+
+class InceptionMiniConv(Model):
     """
     A fundamental building block for separable Inception convolutions
     consisting of the following:
@@ -49,7 +50,6 @@ class InceptionMiniConv(layers.Layer):
         (separate) -> 10 * N_o * N_i
         (separate decomp) -> 2 * 2 * 3 * N_o * N_i
     """
-
     def __init__(self, out_width, num_convs, kernel=3, **kwargs):
         """
         Arguments:
@@ -67,12 +67,12 @@ class InceptionMiniConv(layers.Layer):
         super().__init__(**kwargs)
 
         self.bottleneck = layers.Conv2D(
-                filters=out_width,
-                kernel_size=1,
-                strides=1,
-                use_bias=False,
-                activation=None,
-                padding='same'
+            filters=out_width,
+            kernel_size=1,
+            strides=1,
+            use_bias=False,
+            activation=None,
+            padding='same'
         )
 
         self.spatial_convs = list()
@@ -82,19 +82,19 @@ class InceptionMiniConv(layers.Layer):
             bn = layers.BatchNormalization()
 
             row_conv = layers.DepthwiseConv2D(
-                    kernel_size=(kernel, 1),
-                    strides=1,
-                    use_bias=False,
-                    activation=None,
-                    padding='same'
+                kernel_size=(kernel, 1),
+                strides=1,
+                use_bias=False,
+                activation=None,
+                padding='same'
             )
 
             col_conv = layers.DepthwiseConv2D(
-                    kernel_size=(1, kernel),
-                    strides=1,
-                    use_bias=False,
-                    activation=None,
-                    padding='same'
+                kernel_size=(1, kernel),
+                strides=1,
+                use_bias=False,
+                activation=None,
+                padding='same'
             )
 
             self.spatial_convs.append(bn)
@@ -120,15 +120,11 @@ class InceptionMiniConv(layers.Layer):
         _ = self.bottleneck(inputs)
 
         for l in self.spatial_convs:
-            if type(l) == layers.BatchNormalization:
-                _ = l(_, training=training)
-            else:
-                _ = l(_)
+            _ = l(_, training=training)
         return _
 
 
-class InceptionResnetA(layers.Layer):
-
+class InceptionResnetA(Model):
     def __init__(self, out_width, bottleneck=8, **kwargs):
         """
         Constructs a bottleneck block with the final number of output
@@ -150,7 +146,7 @@ class InceptionResnetA(layers.Layer):
             InceptionMiniConv(
                 out_width // bottleneck,
                 num_convs=1,
-                name=self.name+'_path1',
+                name=self.name + '_path1',
             ),
         ]
 
@@ -158,7 +154,7 @@ class InceptionResnetA(layers.Layer):
             InceptionMiniConv(
                 out_width // bottleneck,
                 num_convs=2,
-                name=self.name+'_path2',
+                name=self.name + '_path2',
             ),
         ]
 
@@ -169,7 +165,7 @@ class InceptionResnetA(layers.Layer):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path3',
+                name=self.name + '_path3',
             ),
         ]
 
@@ -180,13 +176,13 @@ class InceptionResnetA(layers.Layer):
             use_bias=False,
             activation=None,
             padding='same',
-            name=self.name+'_up',
+            name=self.name + '_up',
         )
 
         self.paths = [self.path1, self.path2, self.path3]
 
-        self.concat = layers.Concatenate(name=self.name+'_concat')
-        self.add = layers.Add(name=self.name+'_add')
+        self.concat = layers.Concatenate(name=self.name + '_concat')
+        self.add = layers.Add(name=self.name + '_add')
 
     def call(self, inputs, training=False, **kwargs):
         """
@@ -215,14 +211,14 @@ class InceptionResnetA(layers.Layer):
             pre_concat.append(out)
 
         concat = self.concat([out for out in pre_concat])
-        concat = self.bn2(concat)
+        concat = self.bn2(concat, training=training)
         upsample = self.upsample(concat)
 
         # Combine residual and main paths
         return self.add([_, upsample])
 
-class InceptionResnetB(InceptionResnetA):
 
+class InceptionResnetB(InceptionResnetA):
     def __init__(self, out_width, bottleneck=8, **kwargs):
         """
         Constructs a bottleneck block with the final number of output
@@ -242,7 +238,7 @@ class InceptionResnetB(InceptionResnetA):
                 out_width // bottleneck,
                 kernel=7,
                 num_convs=1,
-                name=self.name+'_path1'
+                name=self.name + '_path1'
             )
         ]
 
@@ -253,14 +249,14 @@ class InceptionResnetB(InceptionResnetA):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path2'
+                name=self.name + '_path2'
             ),
         ]
 
         self.paths = [self.path1, self.path2]
 
-class InceptionResnetC(InceptionResnetB):
 
+class InceptionResnetC(InceptionResnetB):
     def __init__(self, out_width, bottleneck=8, **kwargs):
         """
         Resnet style residual bottleneck block consisting of:
@@ -278,7 +274,7 @@ class InceptionResnetC(InceptionResnetB):
             InceptionMiniConv(
                 out_width // bottleneck,
                 num_convs=1,
-                name=self.name+'_path1'
+                name=self.name + '_path1'
             ),
         ]
 
@@ -288,14 +284,16 @@ class InceptionResnetC(InceptionResnetB):
                 kernel_size=1,
                 use_bias=False,
                 activation=None,
-                name=self.name+'_path2'
+                name=self.name + '_path2'
             ),
         ]
+        self.paths = [self.path1, self.path2]
 
-class InceptionReductionA(layers.Layer):
+
+class InceptionReductionA(Model):
 
     # Output of this layer will reduce width by this factor
-    WIDTH_FACTOR=3
+    WIDTH_FACTOR = 3
 
     def __init__(self, out_width, **kwargs):
         """
@@ -315,7 +313,7 @@ class InceptionReductionA(layers.Layer):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path1'
+                name=self.name + '_path1'
             )
         ]
 
@@ -326,14 +324,14 @@ class InceptionReductionA(layers.Layer):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path2_conv1'
+                name=self.name + '_path2_conv1'
             ),
             layers.DepthwiseConv2D(
                 kernel_size=3,
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path2_conv2'
+                name=self.name + '_path2_conv2'
             ),
             layers.SeparableConv2D(
                 filters=out_width,
@@ -342,7 +340,7 @@ class InceptionReductionA(layers.Layer):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path2_conv3'
+                name=self.name + '_path2_conv3'
             )
         ]
 
@@ -351,12 +349,12 @@ class InceptionReductionA(layers.Layer):
                 pool_size=3,
                 padding='same',
                 strides=2,
-                name=self.name+'_path3'
+                name=self.name + '_path3'
             ),
         ]
 
         self.paths = [self.path1, self.path2, self.path3]
-        self.merge = layers.Concatenate(name=self.name+'_concat')
+        self.merge = layers.Concatenate(name=self.name + '_concat')
 
     def call(self, inputs, training=False, **kwargs):
         """
@@ -387,10 +385,11 @@ class InceptionReductionA(layers.Layer):
         # Combine residual and main paths
         return self.merge([out for out in pre_concat], **kwargs)
 
+
 class InceptionReductionB(InceptionReductionA):
 
     # Output of this layer will reduce width by this factor
-    WIDTH_FACTOR=4
+    WIDTH_FACTOR = 4
 
     def __init__(self, out_width, **kwargs):
         """
@@ -399,7 +398,6 @@ class InceptionReductionB(InceptionReductionA):
         """
         super().__init__(out_width, **kwargs)
 
-
         self.path1 = [
             layers.SeparableConv2D(
                 filters=out_width // 2,
@@ -407,7 +405,7 @@ class InceptionReductionB(InceptionReductionA):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path1_conv1'
+                name=self.name + '_path1_conv1'
             ),
             layers.SeparableConv2D(
                 filters=out_width,
@@ -416,7 +414,7 @@ class InceptionReductionB(InceptionReductionA):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path1_conv2'
+                name=self.name + '_path1_conv2'
             )
         ]
 
@@ -427,7 +425,7 @@ class InceptionReductionB(InceptionReductionA):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path4_conv1'
+                name=self.name + '_path4_conv1'
             ),
             layers.SeparableConv2D(
                 filters=out_width,
@@ -436,17 +434,17 @@ class InceptionReductionB(InceptionReductionA):
                 use_bias=False,
                 activation=None,
                 padding='same',
-                name=self.name+'_path4_conv2'
+                name=self.name + '_path4_conv2'
             )
         ]
 
         self.paths = [self.path1, self.path2, self.path3, self.path4]
 
-class InceptionTail(layers.Layer):
+
+class InceptionTail(Model):
     """
     A slightly simplified version of the Inception stem.
     """
-
     def __init__(self, out_width=32, **kwargs):
         """
         Arguments:
@@ -455,66 +453,59 @@ class InceptionTail(layers.Layer):
         super().__init__(**kwargs)
 
         self.conv1 = layers.SeparableConv2D(
-                filters=out_width // 4,
-                name=self.name+'_conv1',
-                kernel_size=3,
-                strides=1,
-                padding='same',
-                use_bias=False,
-                activation=None,
+            filters=out_width // 4,
+            name=self.name + '_conv1',
+            kernel_size=3,
+            strides=1,
+            padding='same',
+            use_bias=False,
+            activation=None,
         )
 
         self.conv2 = layers.SeparableConv2D(
-                filters=out_width // 4,
-                name=self.name+'_conv2',
-                kernel_size=3,
-                strides=2,
-                padding='same',
-                use_bias=False,
-                activation=None,
+            filters=out_width // 4,
+            name=self.name + '_conv2',
+            kernel_size=3,
+            strides=2,
+            padding='same',
+            use_bias=False,
+            activation=None,
         )
         self.pool1 = layers.MaxPooling2D(
-            pool_size=3,
-            strides=2,
-            name=self.name+'_pool1',
-            padding='same'
+            pool_size=3, strides=2, name=self.name + '_pool1', padding='same'
         )
-        self.concat1 = layers.Concatenate(name=self.name+'_concat1')
+        self.concat1 = layers.Concatenate(name=self.name + '_concat1')
 
         self.conv3 = InceptionMiniConv(
             out_width // 4,
             num_convs=1,
             kernel=7,
-            name=self.name+'_conv3',
+            name=self.name + '_conv3',
         )
         self.conv4 = layers.SeparableConv2D(
-                filters=out_width // 4,
-                name=self.name+'_conv4',
-                kernel_size=3,
-                strides=1,
-                padding='same',
-                use_bias=False,
-                activation=None,
+            filters=out_width // 4,
+            name=self.name + '_conv4',
+            kernel_size=3,
+            strides=1,
+            padding='same',
+            use_bias=False,
+            activation=None,
         )
-        self.concat2 = layers.Concatenate(name=self.name+'_concat2')
+        self.concat2 = layers.Concatenate(name=self.name + '_concat2')
 
         self.conv5 = layers.SeparableConv2D(
-                filters=out_width // 2,
-                name=self.name+'_conv5',
-                kernel_size=3,
-                strides=1,
-                padding='same',
-                use_bias=False,
-                activation=None,
+            filters=out_width // 2,
+            name=self.name + '_conv5',
+            kernel_size=3,
+            strides=1,
+            padding='same',
+            use_bias=False,
+            activation=None,
         )
         self.pool2 = layers.MaxPooling2D(
-            pool_size=3,
-            strides=1,
-            name=self.name+'_pool2',
-            padding='same'
+            pool_size=3, strides=1, name=self.name + '_pool2', padding='same'
         )
-        self.concat3 = layers.Concatenate(name=self.name+'_concat3')
-
+        self.concat3 = layers.Concatenate(name=self.name + '_concat3')
 
     def call(self, inputs, training=False, **kwargs):
         """
@@ -537,7 +528,7 @@ class InceptionTail(layers.Layer):
         pool1 = self.pool1(conv1)
         out1 = self.concat1([conv2, pool1])
 
-        conv3 = self.conv3(out1)
+        conv3 = self.conv3(out1, training=training)
         conv4 = self.conv4(out1)
         out2 = self.concat2([conv3, conv4])
 
@@ -545,23 +536,18 @@ class InceptionTail(layers.Layer):
         pool2 = self.pool2(out2)
         return self.concat3([conv5, pool2])
 
+
 class TinyInceptionNet(tf.keras.Model):
 
     NUM_CLASSES = 61
 
-    EXTRACTOR_LEVELS = [
-            InceptionResnetA,
-            InceptionResnetB,
-            InceptionResnetC
-    ]
+    EXTRACTOR_LEVELS = [InceptionResnetA, InceptionResnetB, InceptionResnetC]
 
-    REDUCTION_LEVELS = [
-            InceptionReductionA,
-            InceptionReductionB,
-            None
-    ]
+    REDUCTION_LEVELS = [InceptionReductionA, InceptionReductionB, None]
 
-    def __init__(self, levels, use_head=True, use_tail=True, width=32, **kwargs):
+    def __init__(
+        self, levels, use_head=True, use_tail=True, width=32, **kwargs
+    ):
         """
         Arguments:
             levels: List of positive integers. Each list entry denotes a level of
@@ -580,10 +566,14 @@ class TinyInceptionNet(tf.keras.Model):
         super().__init__(**kwargs)
 
         if len(levels) > 3 or len(levels) <= 0:
-            logging.error("Inception must have between 1 and 3 levels: got %i", len(levels))
+            logging.error(
+                "Inception must have between 1 and 3 levels: got %i",
+                len(levels)
+            )
 
-
-        logging.info("Building InceptionNet model: levels=%s, width=%i", levels, width)
+        logging.info(
+            "Building InceptionNet model: levels=%s, width=%i", levels, width
+        )
 
         # Use default / custom / no tail based on `use_tail`
         if use_tail == True:
@@ -604,16 +594,14 @@ class TinyInceptionNet(tf.keras.Model):
             ident = extractor_type.__name__[-1]
             for block in range(repeats):
                 bottleneck = extractor_type(
-                        out_width=width,
-                        name='incept_%s_%i' % (ident, block + 1)
+                    out_width=width, name='incept_%s_%i' % (ident, block + 1)
                 )
                 self.blocks.append(bottleneck)
 
-            if level <=1 :
+            if level <= 1:
                 ident = reduction_type.__name__[-1]
                 downsample = reduction_type(
-                        out_width=width,
-                        name='reduct_%s_%i' % (ident, level + 1)
+                    out_width=width, name='reduct_%s_%i' % (ident, level + 1)
                 )
                 self.blocks.append(downsample)
 
@@ -629,7 +617,6 @@ class TinyInceptionNet(tf.keras.Model):
             self.head = use_head
         else:
             self.head = None
-
 
     def call(self, inputs, training=False, **kwargs):
         """

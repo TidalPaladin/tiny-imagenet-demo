@@ -14,9 +14,9 @@ LEVELS_RESNET_50 = [3, 4, 6, 3]
 LEVELS_RESNET_101 = [3, 4, 23, 3]
 LEVELS_RESNET_152 = [3, 8, 36, 3]
 
-class Tail(layers.Layer):
-    """ Basic tail consisting of a 7x7/1 separable convolution """
 
+class Tail(Model):
+    """ Basic tail consisting of a 7x7/1 separable convolution """
     def __init__(self, out_width=32, depth_multiplier=2):
         """
         Arguments:
@@ -27,7 +27,10 @@ class Tail(layers.Layer):
                         depthwise stage. Default 2.
         """
         super().__init__()
-        logging.debug("Created tail, width=%i, multiplier=%i", out_width, depth_multiplier)
+        logging.debug(
+            "Created tail, width=%i, multiplier=%i", out_width,
+            depth_multiplier
+        )
 
         # 7x7/1 separable conv
         # Step 1 - depthwise conv; increase depth by depth_multiplier
@@ -35,34 +38,33 @@ class Tail(layers.Layer):
         # No BN / ReLU, handled in later blocks
         # NOTE SeparableConv2D may not respect depth multipier (bug)
         self.conv1 = layers.Conv2D(
-                filters=out_width // 2,
-                name='Tail_conv',
-                kernel_size=1,
-                strides=1,
-                padding='same',
-                use_bias=False,
-                activation=None,
+            filters=out_width // 2,
+            name='Tail_conv',
+            kernel_size=1,
+            strides=1,
+            padding='same',
+            use_bias=False,
+            activation=None,
         )
 
         self.conv2 = layers.SeparableConv2D(
-                filters=out_width // 2,
-                name='Tail_conv',
-                kernel_size=3,
-                strides=1,
-                padding='same',
-                use_bias=False,
-                activation=None,
+            filters=out_width // 2,
+            name='Tail_conv',
+            kernel_size=3,
+            strides=1,
+            padding='same',
+            use_bias=False,
+            activation=None,
         )
 
         self.pool = layers.MaxPooling2D(
-                pool_size=3,
-                name='Tail_pool',
-                strides=1,
-                padding='same',
+            pool_size=3,
+            name='Tail_pool',
+            strides=1,
+            padding='same',
         )
 
         self.concat = layers.Concatenate()
-
 
     def call(self, inputs, training=False, **kwargs):
         """
@@ -83,13 +85,13 @@ class Tail(layers.Layer):
         pool = self.pool(_)
         return self.concat([conv, pool])
 
-class Bottleneck(layers.Layer):
+
+class Bottleneck(Model):
     """
     Resnet style residual bottleneck block consisting of:
         1. 1x1/1 pointwise bottleneck convolution (+BN + ReLU)
         2. 3x3/1 separable conv to exit bottleneck (+BN + ReLU)
     """
-
     def __init__(self, out_width, bottleneck=4):
         """
         Constructs a bottleneck block with the final number of output
@@ -106,17 +108,17 @@ class Bottleneck(layers.Layer):
         super().__init__()
 
         # Width must be integer multiple of bottlneck factor
-        assert(out_width / bottleneck == out_width // bottleneck)
+        assert (out_width / bottleneck == out_width // bottleneck)
 
         # Pointwise conv, enter bottleneck
         self.conv1 = layers.Conv2D(
-                filters=out_width // bottleneck,
-                name='Bottleneck_enter',
-                kernel_size=1,
-                strides=1,
-                use_bias=False,
-                activation=None,
-                padding='same'
+            filters=out_width // bottleneck,
+            name='Bottleneck_enter',
+            kernel_size=1,
+            strides=1,
+            use_bias=False,
+            activation=None,
+            padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu = layers.ReLU()
@@ -128,13 +130,13 @@ class Bottleneck(layers.Layer):
         # Note: Can specify `bottleneck` arg to exit bottleneck
         #       at the depthwise step (rather than pointwise)
         self.conv2 = layers.SeparableConv2D(
-                filters=out_width,
-                name='Bottleneck_exit',
-                kernel_size=3,
-                strides=1,
-                use_bias=False,
-                activation=None,
-                padding='same'
+            filters=out_width,
+            name='Bottleneck_exit',
+            kernel_size=3,
+            strides=1,
+            use_bias=False,
+            activation=None,
+            padding='same'
         )
         self.bn2 = layers.BatchNormalization()
 
@@ -168,14 +170,14 @@ class Bottleneck(layers.Layer):
         _ = self.merge([inputs, _], **kwargs)
         return self.relu(_)
 
-class Downsample(layers.Layer):
+
+class Downsample(Model):
     """
     Resnet style residual downsampling block consisting of:
         1. 1x1/1 pointwise bottleneck convolution (+BN + ReLU)
         2. 3x3/2 separable conv to exit bottleneck (with downsampling)
         3. 3x3/2 separable conv along main path (no bottlenecking)
     """
-
     def __init__(self, out_width, bottleneck=2, stride=2):
         """
         Constructs a downsample block with the final number of output
@@ -202,17 +204,17 @@ class Downsample(layers.Layer):
         super().__init__()
 
         # Width must be integer multiple of bottlneck factor
-        assert(out_width / bottleneck == out_width // bottleneck)
+        assert (out_width / bottleneck == out_width // bottleneck)
 
         # Pointwise conv, enter bottleneck (residual)
         self.channel_conv_1 = layers.Conv2D(
-                filters=out_width // bottleneck,
-                name='Downsample_enter',
-                kernel_size=1,
-                strides=1,
-                use_bias=False,
-                activation=None,
-                padding='same'
+            filters=out_width // bottleneck,
+            name='Downsample_enter',
+            kernel_size=1,
+            strides=1,
+            use_bias=False,
+            activation=None,
+            padding='same'
         )
         self.bn1 = layers.BatchNormalization()
         self.relu = layers.ReLU()
@@ -221,13 +223,13 @@ class Downsample(layers.Layer):
         # Step 1 - depthwise conv; spatial mixing in bottleneck
         # Step 2 - pointwise conv; exit bottleneck
         self.spatial_conv = layers.SeparableConv2D(
-                filters=out_width,
-                name='Downsample_conv',
-                kernel_size=3,
-                strides=stride,
-                use_bias=False,
-                activation=None,
-                padding='same'
+            filters=out_width,
+            name='Downsample_conv',
+            kernel_size=3,
+            strides=stride,
+            use_bias=False,
+            activation=None,
+            padding='same'
         )
         self.bn2 = layers.BatchNormalization()
 
@@ -235,13 +237,13 @@ class Downsample(layers.Layer):
         # Step 1 - depthwise conv; spatial mixing in bottleneck
         # Step 2 - pointwise conv; exit bottleneck
         self.main = layers.SeparableConv2D(
-                filters=out_width,
-                name='Downsample_main',
-                kernel_size=3,
-                strides=stride,
-                use_bias=False,
-                activation=None,
-                padding='same'
+            filters=out_width,
+            name='Downsample_main',
+            kernel_size=3,
+            strides=stride,
+            use_bias=False,
+            activation=None,
+            padding='same'
         )
 
         # Merge operation to join residual + main paths
@@ -276,16 +278,16 @@ class Downsample(layers.Layer):
         main = self.main(inputs)
 
         # Combine residual and main paths
-        _ =  self.merge([main, _])
+        _ = self.merge([main, _])
         return self.relu(_)
 
-class TinyImageNetHead(layers.Layer):
+
+class TinyImageNetHead(Model):
     """
     Basic vision classification network head consisting of:
         1. 2D Global average pooling
         2. Fully connected layer + bias (no activation)
     """
-
     @staticmethod
     def get_regularizers(l1, l2):
 
@@ -305,7 +307,9 @@ class TinyImageNetHead(layers.Layer):
 
         return regularize
 
-    def __init__(self, num_classes, l1=0.0, l2=0.0, dropout=None, seed=None, **kwargs):
+    def __init__(
+        self, num_classes, l1=0.0, l2=0.0, dropout=None, seed=None, **kwargs
+    ):
         """
         Arguments:
             num_classes: Positive integer, number of classes in the output of the
@@ -334,16 +338,15 @@ class TinyImageNetHead(layers.Layer):
             self.dropout = None
 
         self.dense = layers.Dense(
-                units=num_classes,
-                use_bias=True,
-                activation=None,
-                name='Head_dense',
-                kernel_regularizer=regularize,
-                bias_regularizer=regularize,
+            units=num_classes,
+            use_bias=True,
+            activation=None,
+            name='Head_dense',
+            kernel_regularizer=regularize,
+            bias_regularizer=regularize,
         )
 
         self.softmax = layers.Softmax()
-
 
     def call(self, inputs, training=False, **kwargs):
         """
@@ -369,12 +372,12 @@ class TinyImageNetHead(layers.Layer):
         _ = self.softmax(_) if not training else _
         return _
 
+
 class TinyImageNetMultiStageHead(TinyImageNetHead):
     """
     Similar to TinyImageNetHead, but uses two FC layers. Probably only
     useful where num_features >> num_classes
     """
-
     def __init__(self, num_classes, l1=0.0, l2=0.0, dropout=None, **kwargs):
         """
         Arguments:
@@ -393,12 +396,12 @@ class TinyImageNetMultiStageHead(TinyImageNetHead):
         regularize = TinyImageNetHead.get_regularizers(l1, l2)
 
         self.dense_pre = layers.Dense(
-                units=num_classes*2,
-                use_bias=True,
-                activation='relu',
-                name='Head_dense',
-                kernel_regularizer=regularize,
-                bias_regularizer=regularize,
+            units=num_classes * 2,
+            use_bias=True,
+            activation='relu',
+            name='Head_dense',
+            kernel_regularizer=regularize,
+            bias_regularizer=regularize,
         )
 
         self.dropout2 = layers.Dropout(dropout) if dropout else None
@@ -429,6 +432,7 @@ class TinyImageNetMultiStageHead(TinyImageNetHead):
         #   in order to exploit numerically stable result of combined op
         _ = self.softmax(_) if not training else _
         return _
+
 
 class TinyImageNet(tf.keras.Model):
     """
@@ -461,7 +465,9 @@ class TinyImageNet(tf.keras.Model):
         """
         super().__init__()
 
-        logging.info("Building TinyImagnet model: levels=%s, width=%i", levels, width)
+        logging.info(
+            "Building TinyImagnet model: levels=%s, width=%i", levels, width
+        )
 
         # Use default / custom / no tail based on `use_tail`
         if use_tail == True:
@@ -482,7 +488,7 @@ class TinyImageNet(tf.keras.Model):
 
             # Create a downsample layer that doubles width
             # Default stride=2
-            downsample_layer = Downsample(out_width=2*width)
+            downsample_layer = Downsample(out_width=2 * width)
             self.blocks.append(downsample_layer)
 
             # Update `width` for the next iteration
@@ -498,7 +504,6 @@ class TinyImageNet(tf.keras.Model):
             self.head = use_head
         else:
             self.head = None
-
 
     def call(self, inputs, training=False, **kwargs):
         """

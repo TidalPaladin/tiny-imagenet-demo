@@ -7,7 +7,7 @@ from tensorflow.keras.losses import BinaryCrossentropy
 import numpy as np
 from tin.resnet import *
 import pytest
-from conftest import BaseModelTest
+from test.test_base import BaseModelTest
 
 
 class TestTail(BaseModelTest):
