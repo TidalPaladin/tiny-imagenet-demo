@@ -77,7 +77,20 @@ def preprocess(args):
         seed=args.seed
     )
 
-    return train_generator, val_generator
+    def generator_to_ds(x):
+        gen = lambda: x
+        return tf.data.Dataset.from_generator(gen, (tf.float32, tf.float32))
+
+    train_ds = generator_to_ds(train_generator)
+    val_ds = generator_to_ds(val_generator)
+
+    def pipeline(x):
+        return x.prefetch(10)
+
+    train_ds = pipeline(train_ds)
+    val_ds = pipeline(val_ds)
+
+    return train_ds, val_ds
 
 
 def construct_model(args):
