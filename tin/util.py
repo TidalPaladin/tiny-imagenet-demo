@@ -13,7 +13,6 @@ from enum import Enum
 import tensorflow as tf
 from datetime import datetime
 from tensorflow.keras.callbacks import ModelCheckpoint, ProgbarLogger
-import tensorflow.feature_column as fc
 from tensorboard.plugins.hparams import api as hp
 from absl import logging
 

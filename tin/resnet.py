@@ -463,7 +463,7 @@ class TinyImageNet(tf.keras.Model):
         Keyword Arguments:
             Forwarded to tf.keras.Model
         """
-        super().__init__()
+        super(TinyImageNet, self).__init__()
 
         logging.info(
             "Building TinyImagnet model: levels=%s, width=%i", levels, width

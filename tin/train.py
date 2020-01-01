@@ -13,32 +13,27 @@ from pathlib import Path
 import json
 
 from tensorflow.keras.callbacks import ModelCheckpoint, ProgbarLogger
-from tensorflow.data.experimental import AUTOTUNE
 
 from pathlib import Path
 from glob import glob as glob_func
-from util import *
-from inception import *
-from resnet import *
+from tin.util import *
+from tin.inception import *
+from tin.resnet import *
 
 from tensorboard.plugins.hparams import api as hp
-import tensorflow.feature_column as fc
 from tensorflow.keras.layers import *
 
 from absl import app, logging
-from flags import FLAGS
+from tin.flags import FLAGS
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# Ugly global variable to pass callbacks to util module
-callbacks = list()
 
-def preprocess():
+def preprocess(args):
     """
     Returns a tuple of the form (training generator, validation generator).
     Image preprocessing is handled here via Keras ImageDataGenerator
     """
-
 
     logging.info("Reading images from: %s", FLAGS.src)
 
@@ -50,74 +45,73 @@ def preprocess():
     # Training / validation split is specified here
     # TODO get all these params from FLAGS
     datagen = ImageDataGenerator(
-            #samplewise_center=True,
-            #samplewise_std_normalization=True,
-            horizontal_flip=True,
-            data_format='channels_last',
-            validation_split=FLAGS.validation_split,
-            rotation_range=45,
-            width_shift_range=0.1,
-            height_shift_range=0.1,
-            zoom_range=0.1,
-            rescale=1./255
+    #samplewise_center=True,
+    #samplewise_std_normalization=True,
+        horizontal_flip=True,
+        data_format='channels_last',
+        validation_split=args.validation_split,
+        rotation_range=45,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        zoom_range=0.1,
+        rescale=1. / 255
     )
 
     # Create generator to yield a training set from directory
     train_generator = datagen.flow_from_directory(
-            FLAGS.src,
-            subset='training',
-            target_size=(64, 64),
-            class_mode='sparse',
-            batch_size=FLAGS.batch_size,
-            seed=FLAGS.seed
+        FLAGS.src,
+        subset='training',
+        target_size=(64, 64),
+        class_mode='sparse',
+        batch_size=args.batch_size,
+        seed=args.seed
     )
 
     # Create generator to yield a validation set from directory
     val_generator = datagen.flow_from_directory(
-            FLAGS.src,
-            subset='validation',
-            target_size=(64, 64),
-            class_mode='sparse',
-            batch_size=FLAGS.batch_size,
-            seed=FLAGS.seed
+        args.src,
+        subset='validation',
+        target_size=(64, 64),
+        class_mode='sparse',
+        batch_size=args.batch_size,
+        seed=args.seed
     )
 
     return train_generator, val_generator
 
 
-def construct_model():
+def construct_model(args):
     """Returns a TinyImageNet model. Place custom head/tail layer inclusions here"""
 
     # Here TinyImageNetHead is explicitly constructed for clarity and passed
     #   as the use_head arg to TinyImageNet. Can also use `use_head=True`.
-    head = TinyImageNetHead(num_classes=FLAGS.classes,
-                            l1=FLAGS.l1,
-                            l2=FLAGS.l2,
-                            dropout=FLAGS.dropout,
-                            seed=FLAGS.seed,
-                            name='head')
+    head = TinyImageNetHead(
+        num_classes=args.num_classes,
+        l1=args.l1,
+        l2=args.l2,
+        dropout=args.dropout,
+        seed=args.seed,
+        name='head'
+    )
 
-    if FLAGS.inception:
-        logging.info("Using Inception network with %i classes", FLAGS.classes)
+    if args.inception:
+        logging.info(
+            "Using Inception network with %i classes", args.num_classes
+        )
         model = TinyInceptionNet(
-                levels=FLAGS.levels,
-                width=FLAGS.width,
-                use_head=head,
-                use_tail=True
+            levels=args.levels, width=args.width, use_head=head, use_tail=True
         )
 
     elif FLAGS.resnet:
-        logging.info("Using Resnet network with %i classes", FLAGS.classes)
+        logging.info("Using Resnet network with %i classes", args.num_classes)
         model = TinyImageNet(
-                levels=FLAGS.levels,
-                width=FLAGS.width,
-                use_head=head,
-                use_tail=True
+            levels=args.levels, width=args.width, use_head=head, use_tail=True
         )
 
     return model
 
-def train_model(model, train, validate, initial_epoch):
+
+def train_model(args, model, train, validate, initial_epoch, callbacks=[]):
     """
     Compiles `model` with metrics / loss / optimizer and
     begins training on `train` / `validate` Datasets starting
@@ -130,7 +124,9 @@ def train_model(model, train, validate, initial_epoch):
     k = 5
     metrics = [
         tf.keras.metrics.SparseCategoricalAccuracy(name='acc'),
-        tf.keras.metrics.SparseTopKCategoricalAccuracy(name='top_%i_acc' % k, k=k),
+        tf.keras.metrics.SparseTopKCategoricalAccuracy(
+            name='top_%i_acc' % k, k=k
+        ),
     ]
 
     # Use softmax + cross entropy loss
@@ -138,25 +134,20 @@ def train_model(model, train, validate, initial_epoch):
     #   softmax internally for a more stable backward pass
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
-    if FLAGS.adam or (not FLAGS.adam and not FLAGS.rmsprop):
+    if args.adam:
         logging.info(
-                "Adam: e=%f, b1=%f, b2=%f",
-                FLAGS.epsilon,
-                FLAGS.beta1,
-                FLAGS.beta2
+            "Adam: e=%f, b1=%f, b2=%f", args.epsilon, args.beta1, args.beta2
         )
         optimizer = tf.keras.optimizers.Adam(
-                learning_rate=FLAGS.lr,
-                epsilon=FLAGS.epsilon,
-                beta_1=FLAGS.beta1,
-                beta_2=FLAGS.beta2
+            learning_rate=args.lr,
+            epsilon=args.epsilon,
+            beta_1=args.beta1,
+            beta_2=args.beta2
         )
-    elif FLAGS.rmsprop:
-        logging.info("RMSProp: e=%f, rho=%f", FLAGS.epsilon, FLAGS.rho)
+    elif args.rmsprop:
+        logging.info("RMSProp: e=%f, rho=%f", args.epsilon, args.rho)
         optimizer = tf.keras.optimizers.RMSprop(
-                learning_rate=FLAGS.lr,
-                epsilon=FLAGS.epsilon,
-                rho=FLAGS.rho
+            learning_rate=args.lr, epsilon=args.epsilon, rho=args.rho
         )
 
     # Compile model with given parameters prior to training
@@ -164,19 +155,24 @@ def train_model(model, train, validate, initial_epoch):
 
     # Gather model.fit_generator args as a dict for printing to user
     fit_args = {
-        'generator': train,
-        'epochs': FLAGS.epochs,
+        'x': train,
+        'epochs': args.epochs,
         'validation_data': validate,
         'callbacks': callbacks,
         'initial_epoch': initial_epoch
     }
-    pretty_args = json.dumps({k: str(v) for k, v in fit_args.items()}, indent=2)
+    pretty_args = json.dumps(
+        {k: str(v)
+         for k, v in fit_args.items()}, indent=2
+    )
 
     logging.info("Writing training data images")
     plot_inputs(train)
 
     logging.info("Fitting model with args: \n%s", pretty_args)
-    history = model.fit_generator(**fit_args)
+    history = model.fit(**fit_args)
+    return history
+
 
 def main(argv):
     """
@@ -191,10 +187,10 @@ def main(argv):
 
     # Assemble model
     FLAGS.levels = [int(x) for x in FLAGS.levels]
-    model = construct_model()
+    model = construct_model(FLAGS)
 
     # Call model on inputs to generate shape info for model.summary()
-    outputs = model(inputs)
+    outputs = model(inputs, training=True)
 
     # Print / save summary and exit if --summary flag given
     if FLAGS.summary:
@@ -227,14 +223,13 @@ def main(argv):
         logging.info("Loading weights from file %s", FLAGS.resume)
         model.load_weights(FLAGS.resume)
         initial_epoch = int(re.search('([0-9]*)\.hdf5', FLAGS.resume).group(1))
-        logging.info("Starting from epoch %i", initial_epoch+1)
+        logging.info("Starting from epoch %i", initial_epoch + 1)
 
-    # Ugly globals, only use callbacks if --dry flag not given
-    global callbacks
     callbacks = get_callbacks(FLAGS) if not FLAGS.dry else []
 
-    train, validate = preprocess()
-    train_model(model, train, validate, initial_epoch)
+    train, validate = preprocess(FLAGS)
+    train_model(FLAGS, model, train, validate, initial_epoch, callbacks)
+
 
 if __name__ == '__main__':
-  app.run(main)
+    app.run(main)
