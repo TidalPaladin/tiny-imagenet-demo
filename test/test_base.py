@@ -55,10 +55,8 @@ class BaseModelTest:
                 )
             )
 
-    @pytest.mark.parametrize(
-        'training', [True, False], ids=['training=True', 'training=False'],
-    )
-    def testTrainingStatePassedToLayerCall(self, mock_model, inputs, training):
+    @pytest.mark.parametrize('training', [True, False])
+    def test_training_state_passed_to_forward_call(self, mock_model, inputs, training):
         mock_model(inputs, training=training)
         for layer in mock_model.layers:
             sig = inspect.signature(layer.__class__.call)

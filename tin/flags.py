@@ -1,215 +1,331 @@
 #!python
 """Provides command line flags to customize the training pipleine"""
 
+import argparse
 import os
-from absl import app
-from absl import flags
+from distutils.util import strtobool
 
-FLAGS = flags.FLAGS
 
-flags.DEFINE_string(
-    'src', os.environ.get('SRC_DIR', ''),
-    'Dataset source directory. Target of ImageDataGenerator.flow_from_directory'
-)
+def str2bool(v):
+    """Parses bool args given to argparse"""
+    try:
+        return strtobool(v)
+    except ValueError:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
-flags.DEFINE_string(
-    'artifacts_dir', os.environ.get('ARTIFACTS_DIR', ''),
-    'Destination directory for checkpoints / Tensorboard logs'
-)
 
-flags.DEFINE_bool(
-    'dry', False, (
-        'If true, dont write Tensorboard logs or checkpoint files. '
-        'Use this to experiment without worrying about writing artifacts'
+class NumericValidator(argparse.Action):
+    def __init__(
+        self,
+        option_strings,
+        dest,
+        low=None,
+        high=None,
+        inclusive=True,
+        **kwargs
+    ):
+        super(NumericValidator, self).__init__(option_strings, dest, **kwargs)
+        if self.type not in [int, float]:
+            raise TypeError('dtype must be one of int, float')
+        if low is None and high is None:
+            raise ValueError('low and high cannot both be None')
+        if low is not None and high is not None and low >= high:
+            raise ValueError('must have low < high')
+
+        self.low = self.type(low) if low is not None else float('-inf')
+        self.high = self.type(high) if high is not None else float('inf')
+
+        if not isinstance(inclusive, tuple):
+            inclusive = (inclusive, ) * 2
+        if not all([isinstance(x, bool) for x in inclusive]):
+            raise TypeError(
+                'inclusive must be a single bool or 2-tuple of bools'
+            )
+        self.inclusive = inclusive
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        if isinstance(values, list):
+            values = [self._validate(v) for v in values]
+        else:
+            values = self._validate(values)
+        setattr(namespace, self.dest, values)
+
+    def _validate(self, v):
+        try:
+            v = self.type(v)
+        except ValueError:
+            raise argparse.ArgumentTypeError('could not parse numeric range')
+
+        if not self._check_low(v):
+            raise argparse.ArgumentError(
+                self, 'value {} exceeded minimum {}'.format(v, self.low)
+            )
+        if not self._check_high(v):
+            raise argparse.ArgumentError(
+                self, 'value {} exceeded maximum {}'.format(v, self.high)
+            )
+        return v
+
+    def _check_low(self, v):
+        return v >= self.low if self.inclusive[0] else v > self.low
+
+    def _check_high(self, v):
+        return v <= self.high if self.inclusive[0] else v < self.high
+
+
+# Read env vars for some defaults
+def parse_args(args):
+    SRC_DIR = os.environ.get('SRC_DIR', '')
+    ARTIFACT_DIR = os.environ.get('ARTIFACT_DIR', '')
+    default_result_path = os.path.join(ARTIFACT_DIR, 'results')
+    default_log_path = os.path.join(ARTIFACT_DIR, 'logs/cnndm.log')
+    default_model_path = os.path.join(ARTIFACT_DIR, 'models')
+
+    parser = argparse.ArgumentParser()
+
+    # File path selection
+    file_group = parser.add_argument_group('file paths')
+    file_group.add_argument(
+        "--src", default=SRC_DIR, help='Filepath of dataset'
     )
-)
-
-flags.DEFINE_bool('inception', False, ('use inception'))
-flags.DEFINE_bool('early_stopping', False, ('early stopping'))
-
-flags.DEFINE_bool('resnet', False, ('use resnet'))
-flags.DEFINE_bool('adam', True, ('foo'))
-flags.DEFINE_bool('rmsprop', False, ('foo'))
-
-flags.DEFINE_integer('batch_size', 32, 'Batch size for training')
-flags.DEFINE_integer('width', 32, 'width')
-
-flags.DEFINE_integer(
-    'image_dim', 64, 'Dimension in pixels of the square training images'
-)
-
-flags.DEFINE_bool(
-    'summary', False, (
-        'Print/save a model layer summary and exit. '
-        'Model summary will be saved in artifact directory'
+    file_group.add_argument(
+        "--model_path",
+        default=default_model_path,
+        help='Output filepath of model checkpoints'
     )
-)
-
-flags.DEFINE_bool(
-    'tune', False, 'Reserved for future use. Hyperparameter tuning'
-)
-
-flags.DEFINE_list(
-    'levels', [3, 6, 4], (
-        'Levels to use in the TraderNet encoder architecture. '
-        'ie. --levels=3,6,4 for 3 levels of downsampling with 3,6,4'
-        'bottleneck blocks for the respective levels'
+    file_group.add_argument(
+        "--result_path", type=str, default=default_result_path
     )
-)
-
-flags.DEFINE_integer(
-    'num_classes', 61,
-    'Number of output classes if running in classification mode.'
-)
-
-flags.DEFINE_integer('epochs', 100, 'Number of training epochs')
-
-flags.DEFINE_float(
-    'validation_split', 0.1, 'Fraction of dataset to reserve for validation'
-)
-
-flags.DEFINE_float('lr', 0.001, 'Initial learning rate')
-
-flags.DEFINE_float(
-    'lr_decay_coeff', None, (
-        'Coefficient for learning rate decay. '
-        'LR decay is given by e^(coeff * (epoch - interval))'
+    file_group.add_argument(
+        "--bert_config_path", default='/app/bert_config_uncased_base.json'
     )
-)
+    file_group.add_argument('--log_file', default=default_log_path)
+    file_group.add_argument('--dataset', default='')
 
-flags.DEFINE_integer(
-    'lr_decay_freq', 10, 'Number of epochs between learning rate decay'
-)
+    # Model properties
+    model_group = parser.add_argument_group('model properties')
+    model_group.add_argument(
+        "--model", default='resnet', type=str, choices=['resnet', 'inception']
+    )
+    model_group.add_argument(
+        "--width",
+        default=32,
+        type=int,
+        low=1,
+        action=NumericValidator,
+        help='model width after tail'
+    )
+    model_group.add_argument(
+        "--levels",
+        default=[3, 6, 4],
+        type=int,
+        low=1,
+        action=NumericValidator,
+        nargs='+',
+        help='bottleneck repeats per levels'
+    )
+    model_group.add_argument(
+        "--l1",
+        default=0,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(True, False),
+        action=NumericValidator,
+        help='l1 regularization value for head'
+    )
+    model_group.add_argument(
+        "--l2",
+        default=0,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(True, False),
+        action=NumericValidator,
+        help='l2 regularization value for head'
+    )
+    model_group.add_argument(
+        "--num_classes",
+        default=64,
+        type=int,
+        low=1,
+        action=NumericValidator,
+    )
+    model_group.add_argument(
+        "--dropout",
+        default=0,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(True, False),
+        action=NumericValidator,
+    )
 
-flags.DEFINE_float('l1', 0, 'L1 norm for head')
+    # runtime properties
+    runtime_group = parser.add_argument_group('runtime')
+    runtime_group.add_argument(
+        "--mode", default='train', type=str, choices=['train', 'test']
+    )
+    runtime_group.add_argument(
+        "--validation_split",
+        default=0.1,
+        type=float,
+        low=0,
+        high=1,
+        inclusive=(True, False),
+        action=NumericValidator,
+        help='fraction of data for validation'
+    )
+    runtime_group.add_argument(
+        "--batch_size", default=32, type=int, low=1, action=NumericValidator
+    )
+    runtime_group.add_argument(
+        '--visible_gpus',
+        default='1',
+        type=str,
+        help='gpus visible for execution'
+    )
+    runtime_group.add_argument(
+        '--seed', default=42, type=int, help='random seed'
+    )
+    runtime_group.add_argument(
+        "--dry",
+        type=str2bool,
+        nargs='?',
+        default=False,
+        help='run without generating artifacts'
+    )
+    runtime_group.add_argument(
+        "--summary",
+        type=str2bool,
+        nargs='?',
+        default=False,
+        help='print model.summary() and exit'
+    )
+    runtime_group.add_argument(
+        "--tune",
+        type=str2bool,
+        nargs='?',
+        default=False,
+        help='reserved for future use'
+    )
+    runtime_group.add_argument(
+        "--image_dim",
+        type=int,
+        low=1,
+        action=NumericValidator,
+        nargs=2,
+        default=[64, 64]
+    )
 
-flags.DEFINE_float('l2', 0, 'L2 norm for head')
+    # training properties
+    training_group = parser.add_argument_group('training')
+    training_group.add_argument(
+        "--optim",
+        default='adam',
+        type=str,
+        choices=['adam', 'rmsprop'],
+        help='optimizer selection'
+    )
+    training_group.add_argument(
+        "--lr",
+        default=0.001,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(False, False),
+        action=NumericValidator,
+        help='learning rate'
+    )
+    training_group.add_argument(
+        "--beta1",
+        default=0.9,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(False, False),
+        action=NumericValidator,
+        help='adam beta1'
+    )
+    training_group.add_argument(
+        "--beta2",
+        default=0.999,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(False, False),
+        action=NumericValidator,
+        help='adam beta2'
+    )
+    training_group.add_argument(
+        "--epsilon",
+        default=1e-6,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(False, False),
+        action=NumericValidator,
+        help='optimizer epsilon value'
+    )
+    training_group.add_argument(
+        "--lr_decay_coeff",
+        default=None,
+        type=float,
+        low=0,
+        high=1.0,
+        inclusive=(False, False),
+        action=NumericValidator,
+        help='coefficient of exponential learning rate decay'
+    )
+    training_group.add_argument(
+        "--lr_decay_freq",
+        default=10,
+        type=int,
+        low=1,
+        action=NumericValidator,
+        help='epoch frequency of decay step function'
+    )
 
-flags.DEFINE_float('epsilon', 1e-6, 'L2 norm for head')
-flags.DEFINE_float('beta1', 0.9, 'L2 norm for head')
-flags.DEFINE_float('beta2', 0.99, 'L2 norm for head')
+    training_group.add_argument(
+        "--epochs",
+        default=100,
+        type=int,
+        low=1,
+        action=NumericValidator,
+        help='num epochs to train for'
+    )
+    training_group.add_argument(
+        "--early_stopping",
+        type=str2bool,
+        nargs='?',
+        default=False,
+    )
+    training_group.add_argument(
+        "--resume_last", type=str2bool, nargs='?', default=False
+    )
 
-flags.DEFINE_float('dropout', 0, 'Dropout ratio')
+    checkpoint_group = parser.add_argument_group('checkpoint')
+    checkpoint_group.add_argument(
+        '--load_model',
+        default=None,
+        type=str,
+        help='path to model checkpoint'
+    )
+    checkpoint_group.add_argument(
+        "--save_checkpoint_steps", default=5, type=int
+    )
+    checkpoint_group.add_argument(
+        "--checkpoint_fmt",
+        default='tin_{epoch:03d}.hdf5',
+        type=str,
+        help='format for model checkpoint files'
+    )
+    checkpoint_group.add_argument(
+        "--checkpoint_freq",
+        type=int,
+        low=1,
+        action=NumericValidator,
+        help='frequency of model checkpointing'
+    )
 
-flags.DEFINE_integer(
-    'seed', 42, 'If set, the integer to seed all random generators with'
-)
-
-flags.DEFINE_string(
-    'checkpoint_fmt', 'tin_{epoch:03d}.hdf5',
-    'Filename format to use when writing checkpoints'
-)
-
-flags.DEFINE_string(
-    'checkpoint_freq', 'epoch',
-    'Checkpoint frequency passed to tf.keras.callbacks.ModelCheckpoint'
-)
-
-flags.DEFINE_string(
-    'tb_update_freq', 'epoch',
-    'Update frequency passed to tf.keras.callbacks.TensorBoard'
-)
-
-flags.DEFINE_string(
-    'resume', None, 'Resume from the specified model checkpoint filepath'
-)
-
-flags.DEFINE_bool(
-    'resume_last', False, 'Attempt to resume from the most recent checkpoint'
-)
-
-flags.register_validator(
-    'src',
-    lambda v: os.path.isdir(v) and os.access(v, os.R_OK),
-    message='--src must point to an existing directory'
-)
-
-flags.register_validator(
-    'artifacts_dir',
-    lambda v: os.path.isdir(v) and os.access(v, os.W_OK),
-    message='--artifacts_dir must point to an existing directory'
-)
-
-flags.register_validator(
-    'batch_size', lambda v: v > 0, message='--batch_size must be an int > 0'
-)
-
-flags.register_validator(
-    'levels',
-    lambda v: len(v) > 0,
-    message='--levels must be a non-empty list of integers'
-)
-
-flags.register_validator(
-    'num_classes',
-    lambda v: v > 0,
-    message='--num_classes must be an integer > 0'
-)
-
-flags.register_validator(
-    'epochs', lambda v: v > 0, message='--epochs must be an integer > 0'
-)
-
-flags.register_validator(
-    'validation_split',
-    lambda v: v >= 0,
-    message='--validation_split must be a float on interval (0, 1)'
-)
-
-flags.register_validator(
-    'validation_split',
-    lambda v: v > 0,
-    message='--image_dim must be an int > 0'
-)
-
-flags.register_validator(
-    'lr',
-    lambda v: 0 < v < 1.0,
-    message='--lr must be an float on interval (0.0, 1.0)'
-)
-
-flags.register_validator(
-    'lr_decay_coeff',
-    lambda v: v == None or float(v) > 0,
-    message='--lr_decay_coeff must None or float > 0'
-)
-
-flags.register_validator(
-    'lr_decay_freq',
-    lambda v: int(v) > 0,
-    message='--lr_decay_freq must int > 0'
-)
-
-flags.register_validator(
-    'l1', lambda v: float(v) >= 0, message='--l1 must be >= 0'
-)
-
-flags.register_validator('l2', lambda v: v >= 0, message='--l2 must be >= 0')
-
-flags.register_validator(
-    'dropout',
-    lambda v: float(v) >= 0 and float(v) <= 1.0,
-    message='--dropout must be a float on [0, 1.0].'
-)
-
-flags.register_validator(
-    'seed',
-    lambda v: v == None or int(v) == v,
-    message='--seed must be None or an integer'
-)
-
-flags.register_validator(
-    'checkpoint_fmt',
-    lambda v: len(v) > 0,
-    message='--checkpoint_fmt must be a non-empty string'
-)
-
-flags.register_validator(
-    'resume',
-    lambda v: v == None or os.path.isfile(v),
-    message='--resume must point to an existing checkpoint file'
-)
-
-flags.register_validator(
-    'image_dim', lambda v: v > 0, message='--image_dim must be an int > 0'
-)
+    return parser.parse_args(args)

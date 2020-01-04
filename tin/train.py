@@ -14,7 +14,6 @@ import json
 
 from tensorflow.keras.callbacks import ModelCheckpoint, ProgbarLogger
 
-from pathlib import Path
 from glob import glob as glob_func
 from tin.util import *
 from tin.inception import *
@@ -24,7 +23,7 @@ from tensorboard.plugins.hparams import api as hp
 from tensorflow.keras.layers import *
 
 from absl import app, logging
-from tin.flags import FLAGS
+from tin.flags import parse_args
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
@@ -35,7 +34,7 @@ def preprocess(args):
     Image preprocessing is handled here via Keras ImageDataGenerator
     """
 
-    logging.info("Reading images from: %s", FLAGS.src)
+    logging.info("Reading images from: %s", args.src)
 
     # Create object to read training images w/ preprocessing
     #
@@ -43,7 +42,6 @@ def preprocess(args):
     #   with random brightness perturbartions and horizontal flips
     #
     # Training / validation split is specified here
-    # TODO get all these params from FLAGS
     datagen = ImageDataGenerator(
     #samplewise_center=True,
     #samplewise_std_normalization=True,
@@ -59,7 +57,7 @@ def preprocess(args):
 
     # Create generator to yield a training set from directory
     train_generator = datagen.flow_from_directory(
-        FLAGS.src,
+        args.src,
         subset='training',
         target_size=(64, 64),
         class_mode='sparse',
@@ -76,6 +74,7 @@ def preprocess(args):
         batch_size=args.batch_size,
         seed=args.seed
     )
+    print(train_generator)
 
     def generator_to_ds(x):
         gen = lambda: x
@@ -115,11 +114,12 @@ def construct_model(args):
             levels=args.levels, width=args.width, use_head=head, use_tail=True
         )
 
-    elif FLAGS.resnet:
+    elif args.resnet:
         logging.info("Using Resnet network with %i classes", args.num_classes)
         model = TinyImageNet(
             levels=args.levels, width=args.width, use_head=head, use_tail=True
         )
+    print(model)
 
     return model
 
@@ -193,55 +193,56 @@ def main(argv):
     work as intended
     """
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+    args = parse_args(sys.argv[1:])
 
     # Specify input shape for model.summary(). Batch dimension always excluded
-    image_shape = (FLAGS.image_dim, FLAGS.image_dim, 3)
+    image_shape = (args.image_dim, args.image_dim, 3)
     inputs = layers.Input(shape=image_shape, dtype=tf.float32)
 
     # Assemble model
-    FLAGS.levels = [int(x) for x in FLAGS.levels]
-    model = construct_model(FLAGS)
+    args.levels = [int(x) for x in args.levels]
+    model = construct_model(args)
 
     # Call model on inputs to generate shape info for model.summary()
     outputs = model(inputs, training=True)
 
     # Print / save summary and exit if --summary flag given
-    if FLAGS.summary:
-        out_path = os.path.join(FLAGS.artifacts_dir, 'summary.txt')
+    if args.summary:
+        out_path = os.path.join(args.artifacts_dir, 'summary.txt')
         model.summary()
         save_summary(model, out_path)
         logging.info("Exiting after printing model summary")
         sys.exit(0)
 
     # Build checkpoint dir path and clean empty dirs
-    checkpoint_dir = os.path.join(FLAGS.artifacts_dir, 'checkpoint')
+    checkpoint_dir = os.path.join(args.artifacts_dir, 'checkpoint')
     clean_empty_dirs(checkpoint_dir)
 
     initial_epoch = 0
-    resume_file = FLAGS.resume if FLAGS.resume else None
+    resume_file = args.resume if args.resume else None
 
     # If --resume_last given, try to resume from last checkpoint by filename
-    if FLAGS.resume_last:
+    if args.resume_last:
         # Find directory of latest run
-        chkpt_path = Path(FLAGS.artifacts_dir, 'checkpoint')
+        chkpt_path = Path(args.artifacts_dir, 'checkpoint')
         latest_path = sorted(list(chkpt_path.glob('20*')))[-1]
         logging.info("Using latest run - %s", latest_path)
 
         # Find latest checkpoint file
         latest_checkpoint = sorted(list(latest_path.glob('*.hdf5')))[-1]
-        FLAGS.resume = str(latest_checkpoint.resolve())
+        args.resume = str(latest_checkpoint.resolve())
 
     # If --resume, try to resume from the given checkpoint file
-    if FLAGS.resume:
-        logging.info("Loading weights from file %s", FLAGS.resume)
-        model.load_weights(FLAGS.resume)
-        initial_epoch = int(re.search('([0-9]*)\.hdf5', FLAGS.resume).group(1))
+    if args.resume:
+        logging.info("Loading weights from file %s", args.resume)
+        model.load_weights(args.resume)
+        initial_epoch = int(re.search('([0-9]*)\.hdf5', args.resume).group(1))
         logging.info("Starting from epoch %i", initial_epoch + 1)
 
-    callbacks = get_callbacks(FLAGS) if not FLAGS.dry else []
+    callbacks = get_callbacks(args) if not args.dry else []
 
-    train, validate = preprocess(FLAGS)
-    train_model(FLAGS, model, train, validate, initial_epoch, callbacks)
+    train, validate = preprocess(args)
+    train_model(args, model, train, validate, initial_epoch, callbacks)
 
 
 if __name__ == '__main__':

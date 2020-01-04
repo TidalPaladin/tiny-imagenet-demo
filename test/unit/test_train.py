@@ -7,6 +7,7 @@ import pytest
 import os
 import tensorflow
 import logging
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 def assert_kwarg_call(call, key, value):
@@ -18,149 +19,138 @@ def assert_kwarg_call(call, key, value):
     )
 
 
-class TestPreprocess:
-    @pytest.fixture
-    def flags(self, mocker, mock_flags):
-        mock_flags.validation_split = 0.5
-        mock_flags.batch_size = 1
-        mock_flags.seed = 42
+class TestPreprocessMock:
+    @pytest.fixture(autouse=True)
+    def datagen(self, mocker, batch_gen, flags):
+        m = mocker.MagicMock(name='datagen', spec_set=ImageDataGenerator)
+        m().flow_from_directory.return_value = batch_gen(flags.batch_size)
+        m.reset_mock()
+        mocker.patch(
+            'tensorflow.keras.preprocessing.image.ImageDataGenerator', m
+        )
+        mocker.patch('tin.train.ImageDataGenerator', m)
+        return m
+
+    @pytest.fixture(
+        params=[
+            pytest.param(0, id='flags1'),
+            pytest.param(1, id='flags2'),
+        ]
+    )
+    def flags(self, mocker, mock_flags, request):
+        if request.param == 0:
+            mock_flags.validation_split = 0.5
+            mock_flags.batch_size = 1
+            mock_flags.seed = 42
+        else:
+            mock_flags.validation_split = 0.4
+            mock_flags.batch_size = 2
+            mock_flags.seed = 21
         return mock_flags
+
+    @pytest.fixture(
+        scope='class',
+        params=[
+            pytest.param(0, id='train'),
+            pytest.param(1, id='val'),
+        ]
+    )
+    def split(self, request):
+        return request.param
+
+    def test_datagen_called(self, flags, datagen):
+        preprocess(flags)
+        datagen.assert_called_once()
+
+    def test_flow_called(self, flags, datagen):
+        preprocess(flags)
+        datagen.assert_called_once()
 
     def test_train_val_tuple_returned(self, flags):
         ret = preprocess(flags)
         assert isinstance(ret, tuple)
         assert len(ret) == 2
 
-    def test_image_ds_yields_img_label_tuples(self, flags):
-        train, val = preprocess(flags)
-        for ds in [train, val]:
-            example = list(ds.take(1))[0]
-            assert len(example) == 2
-            assert isinstance(example, tuple)
+    def test_image_ds_yields_img_label_tuples(self, flags, split):
+        example = self.call(flags, split)
+        assert isinstance(example, tuple)
+        assert len(example) == 2
 
-    def test_image_ndims(self, flags):
-        train, val = preprocess(flags)
-        for ds in [train, val]:
-            img, label = list(ds.take(1))[0]
-            assert len(img.shape) == 4
+    def test_image_shape(self, flags, split):
+        img, label = self.call(flags, split)
+        assert img.shape == (flags.batch_size, 64, 64, 3)
 
-    def test_label_ndims(self, flags):
-        train, val = preprocess(flags)
-        for ds in [train, val]:
-            img, label = list(ds.take(1))[0]
-            assert len(label.shape) == 1
+    def test_label_shape(self, flags, split):
+        img, label = self.call(flags, split)
+        assert label.shape == (flags.batch_size, )
 
-    def test_channels_last(self, flags):
-        train, val = preprocess(flags)
-        img, label = list(train.take(1))[0]
-        assert img.shape[-1] == 3
-
-    def test_batch_size(self, flags):
-        train, val = preprocess(flags)
-        img, label = list(train.take(1))[0]
-        assert img.shape[0] == flags.batch_size
-        assert label.shape[0] == flags.batch_size
-
-    def test_image_size(self, flags):
-        train, val = preprocess(flags)
-        img, label = list(train.take(1))[0]
-        assert img.shape[1] == 64
-        assert img.shape[2] == 64
-
-    def test_deterministic_output(self, flags):
-        train1, _ = preprocess(flags)
-        train2, _ = preprocess(flags)
-        img1, lab1 = list(train1.take(1))[0]
-        img2, lab2 = list(train2.take(1))[0]
+    def test_deterministic_output(self, flags, split):
+        img1, lab1 = self.call(flags, split)
+        img2, lab2 = self.call(flags, split)
         assert tensorflow.reduce_all(tensorflow.math.equal(img1, img2))
         assert tensorflow.reduce_all(tensorflow.math.equal(lab1, lab2))
 
-    @pytest.mark.parametrize(
-        'split', [
-            pytest.param(0.5),
-            pytest.param(-0.1, marks=pytest.mark.xfail(raises=ValueError)),
-            pytest.param(1.0, marks=pytest.mark.xfail(raises=ValueError)),
-        ]
-    )
-    def test_val_split(self, flags, split):
+    def call(self, flags, split):
+        print(preprocess(flags))
+        print(preprocess(flags)[split])
+        ds = list(preprocess(flags)[split].take(1))
+        print(ds)
+        return ds[0]
+
+    @pytest.mark.parametrize('split', [
+        pytest.param(0.5),
+    ])
+    def test_valdation_split_from_flag(self, datagen, flags, split):
         flags.validation_split = split
-        train, val = preprocess(flags)
-        train1, _ = list(train.take(1))[0]
-        val1, _ = list(val.take(1))[0]
-        assert not tensorflow.reduce_all(tensorflow.math.equal(train1, val1))
+        preprocess(flags)
+        datagen.assert_called_once()
+        assert datagen.call_args.kwargs['validation_split'] == split
 
 
 class TestConstructModel:
-    @pytest.fixture
-    def mock_head(self, mocker):
-        m = mocker.MagicMock(name='head', spec_set=TinyImageNetHead)
-        mocker.patch('tin.resnet.TinyImageNetHead', m)
-        mocker.patch('tin.train.TinyImageNetHead', m)
-        return m
-
-    @pytest.fixture
-    def mock_resnet(self, mocker):
-        m = mocker.MagicMock(name='resnet', spec_set=TinyImageNet)
-        mocker.patch('tin.resnet.TinyImageNet', m)
-        mocker.patch('tin.train.TinyImageNet', m)
-        return m
-
-    @pytest.fixture
-    def mock_inception(self, mocker):
-        m = mocker.MagicMock(name='inception', spec_set=TinyInceptionNet)
-        mocker.patch('tin.inception.TinyInceptionNet', m)
-        mocker.patch('tin.train.TinyInceptionNet', m)
-        return m
-
-    @pytest.fixture(params=['resnet', 'inception'])
-    def mock_model(
-        self, request, mock_flags, mock_head, mock_resnet, mock_inception
-    ):
-        if request.param == 'resnet':
-            mock_flags.inception = False
-            mock_flags.resnet = True
-            return mock_resnet
-        else:
-            mock_flags.inception = True
-            mock_flags.resnet = False
-            return mock_inception
-
     @pytest.mark.parametrize(
-        'kwarg', [
-            pytest.param('num_classes', id='num_classes'),
-            pytest.param('l1', id='l1'),
-            pytest.param('l2', id='l2'),
-            pytest.param('dropout', id='dropout'),
-            pytest.param('seed', id='seed'),
+        'kwarg,flag', [
+            pytest.param('num_classes', 'num_classes', id='num_classes'),
+            pytest.param('l1', 'l1', id='l1'),
+            pytest.param('l2', 'l2', id='l2'),
+            pytest.param('dropout', 'dropout', id='dropout'),
+            pytest.param('seed', 'seed', id='seed'),
         ]
     )
-    @pytest.mark.usefixtures('mock_resnet', 'mock_inception')
-    def testHeadConstructorFromFlags(self, kwarg, mock_head, mock_flags):
-        value = getattr(mock_flags, kwarg)
-        model = construct_model(mock_flags)
-        mock_head.assert_called()
-        assert_kwarg_call(mock_head.call_args, kwarg, value)
-
-    @pytest.mark.usefixtures('mock_head')
-    def testModelTypeFromFlags(self, mock_model, mock_flags):
-        model = construct_model(mock_flags)
-        mock_model.assert_called()
-        assert model == mock_model()
+    def test_head_constructor_args(self, head, mock_flags, kwarg, flag):
+        value = getattr(mock_flags, flag)
+        construct_model(mock_flags)
+        head.assert_called_once()
+        assert_kwarg_call(head.call_args, kwarg, value)
 
     @pytest.mark.parametrize(
-        'kwarg', [
-            pytest.param('levels', id='levels'),
-            pytest.param('width', id='width'),
+        'kwarg,flag', [
+            pytest.param('levels', 'levels', id='levels'),
+            pytest.param('width', 'width', id='width'),
         ]
     )
-    @pytest.mark.usefixtures('mock_head')
-    def testModelConstructorFromFlags(
-        self, kwarg, mock_head, mock_model, mock_flags
-    ):
-        value = getattr(mock_flags, kwarg)
-        model = construct_model(mock_flags)
-        mock_model.assert_called()
-        assert_kwarg_call(mock_model.call_args, kwarg, value)
+    @pytest.mark.usefixtures('head')
+    def test_model_constructor_flag_args(self, model, mock_flags, kwarg, flag):
+        value = getattr(mock_flags, flag)
+        construct_model(mock_flags)
+        model.assert_called_once()
+        assert_kwarg_call(model.call_args, kwarg, value)
+
+    @pytest.mark.parametrize(
+        'kwarg,val', [
+            pytest.param('use_tail', True, id='use_tail'),
+        ]
+    )
+    @pytest.mark.usefixtures('head')
+    def test_model_constructor_fixed_args(self, model, mock_flags, kwarg, val):
+        construct_model(mock_flags)
+        model.assert_called_once()
+        assert_kwarg_call(model.call_args, kwarg, val)
+
+    def test_model_use_head(self, model, head, mock_flags):
+        construct_model(mock_flags)
+        model.assert_called_once()
+        assert_kwarg_call(model.call_args, 'use_head', head())
 
 
 class TestMockTrain:
@@ -287,26 +277,3 @@ class TestMockTrain:
         mock_model.fit.assert_called()
         call = mock_model.fit.call_args
         assert_kwarg_call(call, key, value)
-
-
-@pytest.mark.skip
-class TestTrain:
-    @pytest.fixture(autouse=True)
-    def mock_flags(self, mocker):
-        m = mocker.MagicMock(name='FLAGS')
-        return m
-
-    def test_main_call(self, src_dir, artifacts_dir, caplog):
-        sys.argv = [
-            'train.py',
-            '--src=%s' % src_dir,
-            '--artifacts_dir=%s' % artifacts_dir,
-            '--validation_split=0.5',
-            '--num_classes=3',
-            '--resnet',
-            '--epochs=1',
-            '--levels=1,1',
-        ]
-        with caplog.at_level(logging.ERROR):
-            with pytest.raises(SystemExit):
-                app.run(main)
