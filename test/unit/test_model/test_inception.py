@@ -53,7 +53,7 @@ class TestMiniConv(BaseModelTest):
             pytest.param(8, id='out_width=8'),
     ])
     def output_shape(self, request, input_shape):
-        return *input_shape[:-1], request.param
+        return tuple(input_shape[:-1] + [request.param])
 
     @pytest.fixture(
         params=[
