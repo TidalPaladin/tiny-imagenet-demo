@@ -1,0 +1,62 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@0.5.0
+  codecov: codecov/codecov@1.0.4
+
+jobs:
+
+  build_and_test:
+    executor: docker/machine
+    steps:
+      - checkout
+      - docker/check
+      - docker/build:
+          image: tidalpaladin/tiny-imagenet
+          tag: test
+      - run:
+          name: Run tests
+          command: |
+            set +o pipefail
+            docker rm twitlib-test | true
+            docker run --name=twitlib-test tidalpaladin/twitlib:test
+      - run:
+          name: Copy coverage.xml artifact
+          command: |
+            mkdir -p cov
+            docker cp twitlib-test:/cov/coverage.xml cov/
+      - persist_to_workspace:
+          root: cov
+          paths:
+            - coverage.xml
+
+  coverage_upload:
+    machine: true
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/cov
+      - run:
+          name: Extract coverage.xml artifact
+          command: |
+            cp /tmp/cov/coverage.xml ./
+      - codecov/upload:
+          file: coverage.xml
+
+workflows:
+  build_and_publish:
+    jobs:
+      - build_and_test
+      - coverage_upload:
+          requires:
+            - build_and_test
+      - docker/publish:
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only:
+                - master
+          image: tidalpaladin/twitlib
+          tag: stable
+          extra_build_args: '--target=base'
