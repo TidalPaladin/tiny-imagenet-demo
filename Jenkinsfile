@@ -10,7 +10,13 @@ pipeline {
       }
 
       stage('Build') {
+        agent {
+          docker {
+            image 'python:3-alpine' 
+          }
+        }
         steps {
+          sh 'python -m pip install --upgrade pip'
           sh 'pip install --user -r requirements.txt'
         }
       }
@@ -20,7 +26,6 @@ pipeline {
           sh 'pytest --cov=tin --cov-report=xml'
         }
       }
-
 
     }
 }
