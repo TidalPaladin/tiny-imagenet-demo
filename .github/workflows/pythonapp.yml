@@ -7,7 +7,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: tensorflow/tensorflow
+      image: tensorflow/tensorflow:py3
 
     steps:
     - uses: actions/checkout@v1
