@@ -9,17 +9,18 @@ pipeline {
         }
       }
 
+      stage('Build') {
+        steps {
+          sh 'pip install --user -r requirements.txt'
+        }
+      }
+
       stage('Test') {
         steps {
           sh 'pytest --cov=tin --cov-report=xml'
         }
       }
 
-      stage('Build') {
-        steps {
-          echo 'docker-compose build'
-        }
-      }
 
     }
 }
