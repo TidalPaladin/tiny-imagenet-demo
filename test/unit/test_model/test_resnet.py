@@ -28,7 +28,7 @@ class TestTail(BaseModelTest):
         ]
     )
     def output_shape(self, request, input_shape):
-        return *input_shape[:-1], request.param
+        return tuple(input_shape[:-1], [request.param])
 
     @pytest.fixture
     def model(self, output_shape):
